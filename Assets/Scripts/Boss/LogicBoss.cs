@@ -71,8 +71,11 @@ public class LogicBoss : MonoBehaviour
         if (plr == null) return;
 
         backwardTimeCount += Time.fixedDeltaTime;
+        
         var vect3_dir = (plr.transform.position - transform.position);
         var flt_distance = Vector3.Distance(plr.transform.position, transform.position);
+        if (flt_distance > 7f) { currentState = BossStates.WalkForwardTracking; backwardTimeCount = 0f; return; }
+
         Vector3 lookDir = transform.position + vect3_dir;
         lookDir.y = transform.position.y;
         lookDir.z = transform.position.z;
@@ -82,7 +85,8 @@ public class LogicBoss : MonoBehaviour
         { 
             currentState = BossStates.Calculating; 
             backwardTimeCount = 0f;  
-            return; }
+            return; 
+        }
 
         var vect3_MoveDir = new Vector3(vect3_dir.x, 0, vect3_dir.z).normalized;
         rb.MovePosition(rb.position - vect3_MoveDir * 2 * Time.fixedDeltaTime);

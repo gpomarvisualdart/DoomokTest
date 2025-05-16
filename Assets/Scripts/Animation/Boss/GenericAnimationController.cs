@@ -40,15 +40,10 @@ public class GenericAnimationController : MonoBehaviour, IAnimationController
     public void ChangeAnimations(int animIndex, bool isLock, bool canPass, Animator animator)
     {
         if (animator == null) return;
-        Debug.Log("not null");
-        if (animIndex == 100) { animator.CrossFade(AnimationIndexes.GenericAnimations[0], 0.2f, 0); return; }
-        Debug.Log("anim index not 0");
-        Debug.Log(canPass);
-        if (currentLockStatus == true && canPass == false) return;
-        Debug.Log("can pass");
+        if (animIndex == 100) { animator.CrossFade(AnimationIndexes.GenericAnimations[0], 0f, 0); return; }
+        if (currentLockStatus && !canPass) return;
         if (currentAnimIndex == animIndex) return;
-        Debug.Log("not same anim");
-        animator.CrossFade(AnimationIndexes.GenericAnimations[animIndex], 0.2f, 0);
+        animator.CrossFade(AnimationIndexes.GenericAnimations[animIndex], 0f, 0);
         currentLockStatus = isLock;
     }
 
@@ -56,5 +51,11 @@ public class GenericAnimationController : MonoBehaviour, IAnimationController
     private void PlayAnimationReceiver(object sender, IAnimationEventSender.PlayAnimationEventArgs e)
     {
         ChangeAnimations(e.animIndex, e.isLock, e.canPass, animator);
+    }
+
+
+    public void testAnimEvent(string text)
+    {
+        Debug.Log(text);
     }
 }

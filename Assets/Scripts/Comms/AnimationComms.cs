@@ -11,6 +11,5 @@ public class AnimationComms : MonoBehaviour, IAnimationEventSender
     public void RequestPlayAnimation(int animIndex, bool isLock, bool canPass)
     {
         PlayAnimation?.Invoke(this, new IAnimationEventSender.PlayAnimationEventArgs { animIndex = animIndex, isLock = isLock, canPass = canPass});
-        Debug.Log($"Sent {animIndex} animation index!");
     }
 }
