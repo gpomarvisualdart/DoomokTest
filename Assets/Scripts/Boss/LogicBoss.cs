@@ -93,6 +93,7 @@ public class LogicBoss : MonoBehaviour
         MovementAnimation(-vect3_MoveDir);
     }
 
+
     private void Calculating()
     {
         float randomChance = Random.Range(0f, 1f);
@@ -163,7 +164,6 @@ public class LogicBoss : MonoBehaviour
         if (currentState == BossStates.WalkForwardTracking || currentState == BossStates.WalkBackwardTracking)
         {
             var flt_DotDir = Vector3.Dot(transform.forward, direction);
-            Debug.Log(flt_DotDir);
             if (animComms == null) { Debug.LogError("No animation comms"); return; }
             if (flt_DotDir > 0f) animComms.RequestPlayAnimation((int)BaseAnimEnums.WALKFWD, false, false);
             else animComms.RequestPlayAnimation((int)BaseAnimEnums.WALKBCK, false, false);
