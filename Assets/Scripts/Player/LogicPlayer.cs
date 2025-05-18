@@ -12,7 +12,7 @@ public class LogicPlayer : MonoBehaviour
     int playerLayer;
     int enemyLayer;
 
-    public Transform GetPlayerTransform() {  return transform; }
+    public Transform GetPlayerTransform() { return transform; }
 
     private void OnEnable()
     {
@@ -27,8 +27,6 @@ public class LogicPlayer : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         playerLayer = LayerMask.NameToLayer("Player");
         enemyLayer = LayerMask.NameToLayer("Enemies");
-
-        Debug.Log($"Player Layer: {playerLayer} | Enemy Layer: {enemyLayer}");
     }
 
 
@@ -58,14 +56,14 @@ public class LogicPlayer : MonoBehaviour
     {
         var flt_count = 0f;
         var flt_time = 0.2f;
-        rb.velocity += new Vector3(0f, 5f, 0f);
+        rb.velocity += new Vector3(0f, 9f, 0f);
         while (flt_count < flt_time)
         {
-            rb.velocity += new Vector3(0f, 0.27f, 0f);
-            flt_count += Time.deltaTime;
-            yield return null;
+            rb.velocity += new Vector3(0f, 10f * Time.fixedDeltaTime, 0f);
+            flt_count += Time.fixedDeltaTime;
+            yield return new WaitForFixedUpdate();
         }
-        rb.velocity = new Vector3(rb.velocity.x, 2.5f, rb.velocity.z);
+        rb.velocity = new Vector3(rb.velocity.x, 4f, rb.velocity.z);
         CO_EarlyJumpBoost = null;
     }
 
@@ -90,13 +88,17 @@ public class LogicPlayer : MonoBehaviour
         
         var flt_Count = 0f;
         var flt_Length = 1f;
+        var b_dashEnded = false;
+
+        rb.velocity += transform.forward * 25f;
         while (flt_Count < flt_Length)
         {
-            if (flt_Count < 0.27f) rb.MovePosition(transform.position + transform.forward * 200f * Time.deltaTime);
-            if (flt_Count > 0.27f) currentState = PlayerStates.Idle;
+            //if (flt_Count < 0.27f) rb.MovePosition(transform.position + transform.forward * 200f * Time.deltaTime);
+            if (flt_Count > 0.27f && !b_dashEnded)
+            { currentState = PlayerStates.Idle; rb.velocity = Vector3.zero; b_dashEnded = true; }
             if (flt_Count > 0.5f) Physics.IgnoreLayerCollision(playerLayer, enemyLayer, false);
-            flt_Count += Time.deltaTime;
-            yield return null;
+            flt_Count += Time.fixedDeltaTime;
+            yield return new WaitForFixedUpdate();
         }
         CO_Dashing = null;
     }

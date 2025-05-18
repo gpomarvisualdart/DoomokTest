@@ -1,16 +1,23 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class LogicBoss : MonoBehaviour
+public class LogicBoss : MonoBehaviour, IGenericAbillityRequests
 {
     LogicPlayer plr;
     AnimationComms animComms;
     Rigidbody rb;
     public BossStates currentState;
     BossStates defaultState;
+
+
+    [SerializeField] List<Abillity> abillities;
+    Abillity currentAbillity;
+    int playerLayer;
+    int enemyLayer;
 
 
     float defaultAttackChance = 0.45f;
@@ -23,6 +30,7 @@ public class LogicBoss : MonoBehaviour
     float currentWalkBckChance = 0.2f;
 
 
+    float minAtkDist = 5.5f;
 
 
     private void OnEnable()
@@ -31,7 +39,13 @@ public class LogicBoss : MonoBehaviour
         currentState = BossStates.WalkForwardTracking;
         animComms = GetComponentInChildren<AnimationComms>();
         if (animComms == null) Debug.Log("AnimComms not found!");
+
+        animComms.AnimationEndsEvent += AnimationEndsEventReceiver;
+        animComms.AnimationTriggerEvent += AnimationTriggerEventReceiver;
+        playerLayer = LayerMask.NameToLayer("Player");
+        enemyLayer = LayerMask.NameToLayer("Enemies");
     }
+
 
     void Start()
     {
@@ -100,8 +114,12 @@ public class LogicBoss : MonoBehaviour
 
         if (randomChance >= currentAttackChance)
         {
-            if (currentState == BossStates.Attack) return;
+            if (currentState == BossStates.Attack || CO_AttackCooldown != null) return;
+            if (plr == null) return;
+            var v3_dist = Vector3.Distance(plr.GetPlayerTransform().position, transform.position);
+            if (v3_dist > minAtkDist) { currentState = BossStates.WalkForwardTracking; return;}
             currentState = BossStates.Attack;
+            
         }
         else if (randomChance >= currentWalkFwdChance)
         {
@@ -116,10 +134,92 @@ public class LogicBoss : MonoBehaviour
     }
 
 
-    private void Attacking()
+    private void StartAttack()
     {
-        Debug.Log("Attack!");
+        if (currentAbillity != null) return;
+        if (abillities.Count < 1) return;
+        currentAbillity = abillities[0];
+        abillities[0].Execute();        
+    }
+
+
+    public void AttackEnds()
+    {
+        currentAbillity = null;
+        CO_AttackCooldown = StartCoroutine(OnAttackCooldown());
         currentState = BossStates.Calculating;
+    }
+    
+
+    Coroutine CO_AttackCooldown;
+    IEnumerator OnAttackCooldown()
+    {
+        var flt_count = 0f;
+        var flt_MaxTime = 1f;
+        while (flt_count < flt_MaxTime)
+        {
+            flt_count += Time.deltaTime;
+            yield return null;
+        }
+        CO_AttackCooldown = null;
+    }
+
+
+
+    public void RequestMovement(Vector3 direction, float duration, bool isDynamic)
+    {
+        if (!isDynamic)
+        {
+            StaticMovement(direction);
+        }
+        else
+        {
+            DynamicMovement(direction, duration);
+        }
+    }
+    private void StaticMovement(Vector3 dir)
+    {
+        Physics.IgnoreLayerCollision(enemyLayer, playerLayer, true);
+        rb.velocity += dir;
+    }
+    Coroutine CO_OnDynamicMovement;
+    private void DynamicMovement(Vector3 dir, float duration)
+    {
+        if (CO_OnDynamicMovement != null) return;
+        Physics.IgnoreLayerCollision(enemyLayer, playerLayer, true);
+        CO_OnDynamicMovement = StartCoroutine(OnDynamicMovement(dir, duration));
+
+    }
+    IEnumerator OnDynamicMovement(Vector3 dir, float duration)
+    {
+        var flt_Count = 0f;
+        var vect3_thisDir = dir;
+
+        while (flt_Count <= duration)
+        {
+            var b_FrontNotClear = Physics.Raycast(transform.position, vect3_thisDir);
+            if (b_FrontNotClear) vect3_thisDir = -vect3_thisDir;
+            rb.MovePosition(rb.position + vect3_thisDir * Time.fixedDeltaTime);
+            flt_Count += Time.fixedDeltaTime;
+            yield return new WaitForFixedUpdate();
+        }
+        CO_OnDynamicMovement = null;
+    }
+
+    public void RequestJump(Vector3 position, Dictionary<string, int> additionalData, float duration)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void RequestAirSlam(Vector3 position, Dictionary<string, int> additionalData, float duration)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void RequestStopMovement()
+    {
+        rb.velocity = Vector3.zero;
+        Physics.IgnoreLayerCollision(enemyLayer, playerLayer, false);
     }
 
 
@@ -131,28 +231,28 @@ public class LogicBoss : MonoBehaviour
                 Debug.LogError("No state defined!");
                 currentState = BossStates.Calculating;
                 break;
-            
+
             case BossStates.Idle:
                 rb.velocity = Vector3.zero; break;
-            
+
             case BossStates.Calculating:
                 Calculating(); break;
-            
+
             case BossStates.Aggro:
                 Debug.Log("Aggro!");
-                currentState = BossStates.WalkForwardTracking; 
+                currentState = BossStates.WalkForwardTracking;
                 break;
-            
+
             case BossStates.WalkForwardTracking:
                 break;
 
             case BossStates.WalkBackwardTracking:
-                backwardTimeMax = Random.Range(0.25f, 0.5f);
+                backwardTimeMax = Random.Range(0.5f, 1f);
                 currentState = BossStates.WalkBackwardTracking;
                 break;
 
             case BossStates.Attack:
-                Attacking();
+                StartAttack();
                 break;
         }
     }
@@ -165,11 +265,29 @@ public class LogicBoss : MonoBehaviour
         {
             var flt_DotDir = Vector3.Dot(transform.forward, direction);
             if (animComms == null) { Debug.LogError("No animation comms"); return; }
-            if (flt_DotDir > 0f) animComms.RequestPlayAnimation((int)BaseAnimEnums.WALKFWD, false, false);
-            else animComms.RequestPlayAnimation((int)BaseAnimEnums.WALKBCK, false, false);
+            if (flt_DotDir > 0f) animComms.RequestPlayAnimation((int)BaseAnimEnums.WALKFWD, 0, false, false);
+            else animComms.RequestPlayAnimation((int)BaseAnimEnums.WALKBCK, 0, false, false);
         }
     }
 
+
+    private void AnimationEndsEventReceiver(object sender, IAnimationEventSender.AnimationEndsEventArgs e)
+    {
+        if (e.animType == (int)AnimationTypes.Attack)
+        {
+            AttackEnds();
+        }
+    }
+
+
+    private void AnimationTriggerEventReceiver(object sender, IAnimationEventSender.AnimationEventTriggerArgs e)
+    {
+        if ((AnimationTypes)e.animtype == AnimationTypes.Attack)
+        {
+            if (currentAbillity == null) return;
+            currentAbillity.AnimEvents(e.index);
+        }
+    }
 
 
     // Update is called once per frame
