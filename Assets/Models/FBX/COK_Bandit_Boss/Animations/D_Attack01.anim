@@ -58267,16 +58267,23 @@ AnimationClip:
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 1.2666667
+  - time: 1.2
     functionName: OnAnimationEventTrigger
     data: 1:1
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 1.5666667
+  - time: 1.2666667
     functionName: OnAnimationEventTrigger
     data: 1:2
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 1.5666667
+    functionName: OnAnimationEventTrigger
+    data: 1:3
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
@@ -58289,8 +58296,8 @@ AnimationClip:
     intParameter: 1
     messageOptions: 0
   - time: 2.2
-    functionName: OnAnimationEndEvent
-    data: 
+    functionName: OnAnimationEventTrigger
+    data: 1:4
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 1
