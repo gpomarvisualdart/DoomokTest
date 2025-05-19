@@ -2,11 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LogicPlayer : MonoBehaviour
+public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback
 {
     InputManager inputManager;
     Rigidbody rb;
     PlayerStates currentState;
+    IEntityHealthController healthController;
 
     int numOfJumpsMidAir = 1;
     int playerLayer;
@@ -27,6 +28,7 @@ public class LogicPlayer : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         playerLayer = LayerMask.NameToLayer("Player");
         enemyLayer = LayerMask.NameToLayer("Enemies");
+        healthController = TryGetComponent(out IEntityHealthController ieh) ? ieh : null;
     }
 
 
@@ -45,6 +47,7 @@ public class LogicPlayer : MonoBehaviour
 
     private void JumpEventReceiver(object sender, System.EventArgs e)
     {
+        if (CO_OnKnockback != null) return;
         if (numOfJumpsMidAir < 1) return;
         if (CO_EarlyJumpBoost != null) StopCoroutine(CO_EarlyJumpBoost);
         numOfJumpsMidAir--;
@@ -56,10 +59,10 @@ public class LogicPlayer : MonoBehaviour
     {
         var flt_count = 0f;
         var flt_time = 0.2f;
-        rb.velocity += new Vector3(0f, 9f, 0f);
+        rb.velocity += new Vector3(0f, 6.5f, 0f);
         while (flt_count < flt_time)
         {
-            rb.velocity += new Vector3(0f, 10f * Time.fixedDeltaTime, 0f);
+            rb.velocity += new Vector3(0f, 50f * Time.fixedDeltaTime, 0f);
             flt_count += Time.fixedDeltaTime;
             yield return new WaitForFixedUpdate();
         }
@@ -76,6 +79,7 @@ public class LogicPlayer : MonoBehaviour
 
     private void DashEventReceiver(object sender, System.EventArgs e)
     {
+        if (CO_OnKnockback != null) return;
         if (currentState == PlayerStates.Dashing || CO_Dashing != null) return;
         currentState = PlayerStates.Dashing;
         CO_Dashing = StartCoroutine(DashDuration());
@@ -87,7 +91,7 @@ public class LogicPlayer : MonoBehaviour
         Physics.IgnoreLayerCollision(playerLayer, enemyLayer, true);
         
         var flt_Count = 0f;
-        var flt_Length = 1f;
+        var flt_Length = 0.75f;
         var b_dashEnded = false;
 
         rb.velocity += transform.forward * 25f;
@@ -106,6 +110,7 @@ public class LogicPlayer : MonoBehaviour
 
     private void Movement()
     {
+        if (CO_OnKnockback != null) return;
         if (currentState == PlayerStates.Dashing) return;
         var vect2_MoveDir = inputManager.GetMovementAxis();
         var vect3_MoveDir = new Vector3(vect2_MoveDir.x, 0, 0);
@@ -127,6 +132,37 @@ public class LogicPlayer : MonoBehaviour
     }
 
 
+    public void DealDamage(float damage, Vector3 dir, float knckBackPwr)
+    {
+        if (currentState == PlayerStates.Dashing || CO_OnKnockback != null) return;
+        if (healthController.GetCurrentHealth() < 1) return;
+        KnockEntityBack(dir, knckBackPwr);
+        healthController.HealthChange(-damage);
+        if (healthController.GetCurrentHealth() < 1) Debug.Log("Player dead!");
+    }
+
+
+    public void KnockEntityBack(Vector3 direction, float power)
+    {
+        if (CO_OnKnockback != null) return;
+        CO_OnKnockback = StartCoroutine(OnKnockback(direction, power));
+    }
+    Coroutine CO_OnKnockback;
+    IEnumerator OnKnockback(Vector3 direction, float power)
+    {
+        var flt_Count = 0f;
+        var flt_Duration = 0.15f;
+        rb.velocity += direction * power;
+
+        while (flt_Count <= flt_Duration)
+        {
+            flt_Count += Time.fixedDeltaTime;
+            yield return new WaitForFixedUpdate();
+        }
+        rb.velocity = Vector3.zero;
+        CO_OnKnockback = null;
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -137,5 +173,4 @@ public class LogicPlayer : MonoBehaviour
     {
         Movement();
     }
-
 }

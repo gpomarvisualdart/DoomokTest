@@ -31,14 +31,23 @@ public class D_Attack1 : Abillity
                 break;
             case 0:
                 if (abillityRequests == null) return;
-                abillityRequests.RequestMovement(transform.forward * 30f, 0f, false);
+                var dict_AdditionalInfo = new Dictionary<MovementAdditionalInfo , int>();
+                abillityRequests.RequestMovement(transform.forward, 30f, 0f, false, dict_AdditionalInfo);
                 break;
             case 1:
                 if (abillityRequests == null) return;
-                abillityRequests.RequestStopMovement();
+                abillityRequests.RequestHitbox(true, 7.5f, 7.5f);
                 break;
             case 2:
-                
+                if (abillityRequests == null) return;
+                abillityRequests.RequestStopMovement();
+                break;
+            case 3:
+                if (abillityRequests == null) return;
+                abillityRequests.RequestHitbox(false, 7.5f, 7.5f);
+                break;
+             case 4:
+                AttackEnds();
                 break;
         }
         
@@ -53,6 +62,6 @@ public class D_Attack1 : Abillity
 
     public override void AttackEnds()
     {
-        throw new System.NotImplementedException();
+        lgcBoss.AttackEnds();
     }
 }

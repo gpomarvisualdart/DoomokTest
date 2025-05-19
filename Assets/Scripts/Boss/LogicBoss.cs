@@ -12,10 +12,12 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests
     Rigidbody rb;
     public BossStates currentState;
     BossStates defaultState;
+    public Transform GetBossTransform() { return rb.transform; }
 
 
     [SerializeField] List<Abillity> abillities;
     Abillity currentAbillity;
+    Abillity lastUsedAbillity;
     int playerLayer;
     int enemyLayer;
 
@@ -33,12 +35,18 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests
     float minAtkDist = 5.5f;
 
 
+    [SerializeField] Transform hitboxTransform;
+    IHitboxController hitBox;
+
+
     private void OnEnable()
     {
         rb = GetComponent<Rigidbody>();
         currentState = BossStates.WalkForwardTracking;
         animComms = GetComponentInChildren<AnimationComms>();
-        if (animComms == null) Debug.Log("AnimComms not found!");
+        hitBox = hitboxTransform.TryGetComponent(out IHitboxController ihb) ? ihb : null;
+        if (animComms == null) Debug.LogError("AnimComms not found!");
+        if (hitBox == null) Debug.LogError("Hitbox not found!");
 
         animComms.AnimationEndsEvent += AnimationEndsEventReceiver;
         animComms.AnimationTriggerEvent += AnimationTriggerEventReceiver;
@@ -138,13 +146,16 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests
     {
         if (currentAbillity != null) return;
         if (abillities.Count < 1) return;
-        currentAbillity = abillities[0];
-        abillities[0].Execute();        
+        var int_RandomAttack = Random.Range(0, abillities.Count);
+        if (lastUsedAbillity == abillities[int_RandomAttack]) return;
+        currentAbillity = abillities[int_RandomAttack];
+        currentAbillity.Execute();        
     }
 
 
     public void AttackEnds()
     {
+        lastUsedAbillity = currentAbillity;
         currentAbillity = null;
         CO_AttackCooldown = StartCoroutine(OnAttackCooldown());
         currentState = BossStates.Calculating;
@@ -165,60 +176,69 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests
     }
 
 
-
-    public void RequestMovement(Vector3 direction, float duration, bool isDynamic)
+    public void RequestMovement(Vector3 direction, float spd, float duration, bool isDynamic, Dictionary<MovementAdditionalInfo, int> additionalInfo)
     {
         if (!isDynamic)
         {
-            StaticMovement(direction);
+            StaticMovement(direction, spd, additionalInfo);
         }
         else
         {
-            DynamicMovement(direction, duration);
+            DynamicMovement(direction, spd, duration, additionalInfo);
         }
     }
-    private void StaticMovement(Vector3 dir)
+    private void StaticMovement(Vector3 dir, float spd, Dictionary<MovementAdditionalInfo, int> addInfo)
     {
         Physics.IgnoreLayerCollision(enemyLayer, playerLayer, true);
-        rb.velocity += dir;
+        rb.velocity += dir * spd;
     }
     Coroutine CO_OnDynamicMovement;
-    private void DynamicMovement(Vector3 dir, float duration)
+    private void DynamicMovement(Vector3 dir, float spd, float duration, Dictionary<MovementAdditionalInfo, int> addInfo)
     {
         if (CO_OnDynamicMovement != null) return;
         Physics.IgnoreLayerCollision(enemyLayer, playerLayer, true);
-        CO_OnDynamicMovement = StartCoroutine(OnDynamicMovement(dir, duration));
+        CO_OnDynamicMovement = StartCoroutine(OnDynamicMovement(dir, spd, duration, addInfo));
 
     }
-    IEnumerator OnDynamicMovement(Vector3 dir, float duration)
+    IEnumerator OnDynamicMovement(Vector3 dir, float spd, float duration, Dictionary<MovementAdditionalInfo, int> addInfo)
     {
         var flt_Count = 0f;
         var vect3_thisDir = dir;
+        int mask = ~addInfo[MovementAdditionalInfo.Layers];
 
         while (flt_Count <= duration)
         {
-            var b_FrontNotClear = Physics.Raycast(transform.position, vect3_thisDir);
-            if (b_FrontNotClear) vect3_thisDir = -vect3_thisDir;
-            rb.MovePosition(rb.position + vect3_thisDir * Time.fixedDeltaTime);
+            var b_FrontNotClear = Physics.Raycast(transform.position, vect3_thisDir, spd * Time.fixedDeltaTime * 5f, mask);
+            if (b_FrontNotClear) { vect3_thisDir = -vect3_thisDir; }
+            transform.LookAt(new Vector3(transform.position.x + vect3_thisDir.x, transform.position.y, transform.position.z));
+            rb.MovePosition(rb.position + vect3_thisDir * spd * Time.fixedDeltaTime);
             flt_Count += Time.fixedDeltaTime;
             yield return new WaitForFixedUpdate();
         }
         CO_OnDynamicMovement = null;
     }
 
-    public void RequestJump(Vector3 position, Dictionary<string, int> additionalData, float duration)
+    Coroutine CO_OnJump;
+    public void RequestJump(Vector3 position, Dictionary<JumpAdditionalInfo, int> additionalData, float duration)
     {
         throw new NotImplementedException();
     }
 
-    public void RequestAirSlam(Vector3 position, Dictionary<string, int> additionalData, float duration)
+
+    public void RequestAirSlam(Vector3 position, Dictionary<JumpAdditionalInfo, int> additionalData, float duration)
     {
         throw new NotImplementedException();
+    }
+
+    public void RequestHitbox(bool turnOn, float damage, float power)
+    {
+        hitBox.HitboxActivation(turnOn, damage, power);
     }
 
     public void RequestStopMovement()
     {
         rb.velocity = Vector3.zero;
+        if (CO_OnDynamicMovement != null) { StopCoroutine(CO_OnDynamicMovement); CO_OnDynamicMovement = null; }
         Physics.IgnoreLayerCollision(enemyLayer, playerLayer, false);
     }
 

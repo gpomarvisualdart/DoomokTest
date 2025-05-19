@@ -93552,30 +93552,37 @@ AnimationClip:
   m_HasGenericRootTransform: 0
   m_HasMotionFloatCurves: 0
   m_Events:
-  - time: 1.2
+  - time: 1.1
     functionName: OnAnimationEventTrigger
     data: 1:0
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 1.2333333
+  - time: 1.1333333
     functionName: OnAnimationEventTrigger
     data: 1:1
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
+  - time: 2.8333333
+    functionName: OnAnimationEventTrigger
+    data: 1:2
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
   - time: 2.8666666
-    functionName: 
-    data: 
+    functionName: OnAnimationEventTrigger
+    data: 1:3
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
   - time: 4.0333333
     functionName: OnAnimationEventTrigger
-    data: 1:2
+    data: 1:4
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 1
