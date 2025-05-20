@@ -259,7 +259,7 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests
                 Calculating(); break;
 
             case BossStates.Aggro:
-                Debug.Log("Aggro!");
+                //Debug.Log("Aggro!");
                 currentState = BossStates.WalkForwardTracking;
                 break;
 
@@ -285,15 +285,15 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests
         {
             var flt_DotDir = Vector3.Dot(transform.forward, direction);
             if (animComms == null) { Debug.LogError("No animation comms"); return; }
-            if (flt_DotDir > 0f) animComms.RequestPlayAnimation((int)BaseAnimEnums.WALKFWD, 0, false, false);
-            else animComms.RequestPlayAnimation((int)BaseAnimEnums.WALKBCK, 0, false, false);
+            if (flt_DotDir > 0f) animComms.RequestPlayAnimation((int)BossAnimEnums.WALKFWD, 0, false, false);
+            else animComms.RequestPlayAnimation((int)BossAnimEnums.WALKBCK, 0, false, false);
         }
     }
 
 
     private void AnimationEndsEventReceiver(object sender, IAnimationEventSender.AnimationEndsEventArgs e)
     {
-        if (e.animType == (int)AnimationTypes.Attack)
+        if (e.animType == (int)AnimationEventTypes.AttackEvent)
         {
             AttackEnds();
         }
@@ -302,7 +302,7 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests
 
     private void AnimationTriggerEventReceiver(object sender, IAnimationEventSender.AnimationEventTriggerArgs e)
     {
-        if ((AnimationTypes)e.animtype == AnimationTypes.Attack)
+        if ((AnimationEventTypes)e.animtype == AnimationEventTypes.AttackEvent)
         {
             if (currentAbillity == null) return;
             currentAbillity.AnimEvents(e.index);

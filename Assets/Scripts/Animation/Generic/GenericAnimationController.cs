@@ -7,12 +7,10 @@ public class GenericAnimationController : MonoBehaviour, IAnimationController
 {
     Animator animator;
     IAnimationEventSender animationComms;
-    int[] currentHashArray;
     int currentAnimIndex;
     bool currentLockStatus;
 
     [SerializeField] int defaultAnimHashArray;
-    [SerializeField] int currentAnimHashArray;
 
 
     private void OnEnable()
@@ -36,7 +34,7 @@ public class GenericAnimationController : MonoBehaviour, IAnimationController
 
     public void InitializeAnimation(int animIndex, bool isLock, Animator animator)
     {
-        throw new System.NotImplementedException();
+        ChangeAnimations(animIndex, defaultAnimHashArray, false, false, animator);
     }
 
 
@@ -45,7 +43,8 @@ public class GenericAnimationController : MonoBehaviour, IAnimationController
         if (animator == null) return;
         if (animIndex == 1000)
         {
-            animator.CrossFade(AnimationIndexes.GenericAnimations[0], 0f, 0);
+            animator.CrossFade(AnimationIndexes.AnimationHashes[defaultAnimHashArray][0], 0f, 0);
+            currentAnimIndex = 0;
             currentLockStatus = false;
             return;
         }
@@ -53,6 +52,7 @@ public class GenericAnimationController : MonoBehaviour, IAnimationController
         if (currentAnimIndex == animIndex) return;
         animator.CrossFade(AnimationIndexes.AnimationHashes[animHashIndex][animIndex], 0f, 0);
         currentLockStatus = isLock;
+        currentAnimIndex = animIndex;
     }
 
 
@@ -64,7 +64,7 @@ public class GenericAnimationController : MonoBehaviour, IAnimationController
 
     public void EndAnimation(string dataParse)
     {
-        //Parse holds Animation type, AnimHashArray of choice to play from, is the animation locked, and whether it can bypass locked animations seperated with a ':'
+        //Parse holds Animation type, AnimHashArray of choice to play from, is the animation locked, and whether it can bypass locked animations. All are seperated with a ':'
         //1000 will account as no animation and will play idle animation instead
 
         int animIndex;

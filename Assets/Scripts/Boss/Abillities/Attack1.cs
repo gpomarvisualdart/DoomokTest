@@ -56,7 +56,7 @@ public class D_Attack1 : Abillity
 
     public override void Execute()
     {
-        animComms.RequestPlayAnimation((int)BaseAnimEnums.ATTACK1, 0, true, false);
+        animComms.RequestPlayAnimation((int)BossAnimEnums.ATTACK1, 0, true, true);
     }
 
 

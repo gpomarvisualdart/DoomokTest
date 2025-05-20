@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum AnimationTypes
+public enum AnimationEventTypes
 {
     Contextual,
-    Attack
+    AttackEvent,
+    LostAttackCombo
 }

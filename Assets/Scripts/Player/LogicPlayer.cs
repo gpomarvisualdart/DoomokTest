@@ -2,16 +2,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback
+public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGenericAbillityRequests
 {
     InputManager inputManager;
     Rigidbody rb;
     PlayerStates currentState;
     IEntityHealthController healthController;
+    AnimationComms animComms;
 
     int numOfJumpsMidAir = 1;
+    int currentCombo;
+    int maxCombos = 2;
     int playerLayer;
     int enemyLayer;
+
+    Abillity currentAbillity;
+
+    [SerializeField] List<Abillity> basicAttacks = new List<Abillity>();
 
     public Transform GetPlayerTransform() { return transform; }
 
@@ -26,9 +33,12 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback
         inputManager.DashEventSender += DashEventReceiver;
 
         rb = GetComponent<Rigidbody>();
+        animComms = GetComponentInChildren<AnimationComms>();
         playerLayer = LayerMask.NameToLayer("Player");
         enemyLayer = LayerMask.NameToLayer("Enemies");
         healthController = TryGetComponent(out IEntityHealthController ieh) ? ieh : null;
+
+        animComms.AnimationTriggerEvent += AnimationTriggerEventReceiver;
     }
 
 
@@ -73,8 +83,57 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback
 
     private void AttackEventReceiver(object sender, System.EventArgs e)
     {
-        Debug.Log("Attacked!");
+        if (currentState == PlayerStates.Dashing) return;
+        if (basicAttacks.Count < 1) return;
+        currentState = PlayerStates.Attacking;
+        currentAbillity = basicAttacks[0];
+        currentAbillity.Execute();
     }
+
+
+    public void AttackEnds()
+    {
+        currentAbillity = null;
+        currentState = PlayerStates.Idle;
+    }
+
+
+    public void RequestMovement(Vector3 direction, float spd, float duration, bool isDynamic, Dictionary<MovementAdditionalInfo, int> additionalInfo)
+    {
+        if (isDynamic)
+        {
+            
+        }
+        else
+        {
+            StaticMovement(direction, spd, additionalInfo);
+        }
+    }
+    private void StaticMovement(Vector3 dir, float spd, Dictionary<MovementAdditionalInfo, int> addInfo)
+    {
+        rb.velocity += dir * spd;
+    }
+
+    public void RequestJump(Vector3 position, Dictionary<JumpAdditionalInfo, int> additionalData, float duration)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void RequestAirSlam(Vector3 position, Dictionary<JumpAdditionalInfo, int> additionalData, float duration)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void RequestHitbox(bool turnOn, float damage, float power)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void RequestStopMovement()
+    {
+        rb.velocity = Vector3.zero;
+    }
+
 
 
     private void DashEventReceiver(object sender, System.EventArgs e)
@@ -94,11 +153,14 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback
         var flt_Length = 0.75f;
         var b_dashEnded = false;
 
+        currentCombo = 0;
+        currentAbillity = null;
+        animComms.RequestPlayAnimation((int)GenericAnimEnums.DASH, 1, true, true);
         rb.velocity += transform.forward * 25f;
         while (flt_Count < flt_Length)
         {
             //if (flt_Count < 0.27f) rb.MovePosition(transform.position + transform.forward * 200f * Time.deltaTime);
-            if (flt_Count > 0.27f && !b_dashEnded)
+            if (flt_Count > 0.3f && !b_dashEnded)
             { currentState = PlayerStates.Idle; rb.velocity = Vector3.zero; b_dashEnded = true; }
             if (flt_Count > 0.5f) Physics.IgnoreLayerCollision(playerLayer, enemyLayer, false);
             flt_Count += Time.fixedDeltaTime;
@@ -111,25 +173,31 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback
     private void Movement()
     {
         if (CO_OnKnockback != null) return;
-        if (currentState == PlayerStates.Dashing) return;
+        if (currentState == PlayerStates.Dashing || currentState == PlayerStates.Attacking) return;
         var vect2_MoveDir = inputManager.GetMovementAxis();
+        if (vect2_MoveDir == Vector2.zero && GroundCheck() == true) { animComms.RequestPlayAnimation((int)GenericAnimEnums.IDLE, 1, false, false); return; }
+
         var vect3_MoveDir = new Vector3(vect2_MoveDir.x, 0, 0);
         rb.MovePosition(rb.position + vect3_MoveDir * 6.5f * Time.fixedDeltaTime);
-        if (vect3_MoveDir == Vector3.zero) return;
         Vector3 lookDir = new Vector3 (transform.position.x + vect3_MoveDir.x, transform.position.y, transform.position.z);
         transform.LookAt(lookDir);
+        animComms.RequestPlayAnimation((int)GenericAnimEnums.WALKFWD, 1, false, false);
 
     }
 
 
-    private void GroundCheck()
+    private bool GroundCheck()
     {
         bool onGround = Physics.Raycast((transform.position + transform.up), Vector3.down, 1.1f);
         if (onGround)
         {
             numOfJumpsMidAir = 1;
+            return true;
         }
+        else
+        return false; 
     }
+
 
 
     public void DealDamage(float damage, Vector3 dir, float knckBackPwr)
@@ -162,6 +230,20 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback
         rb.velocity = Vector3.zero;
         CO_OnKnockback = null;
     }
+
+
+    private void AnimationTriggerEventReceiver(object sender, IAnimationEventSender.AnimationEventTriggerArgs e)
+    {
+        if (e.animtype == (int)AnimationEventTypes.LostAttackCombo)
+        {
+            currentCombo = 0;
+        }
+        if (e.animtype == (int)AnimationEventTypes.AttackEvent)
+        {
+            currentAbillity.AnimEvents(e.index);
+        }
+    }
+
 
     // Update is called once per frame
     void Update()
