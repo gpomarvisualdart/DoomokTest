@@ -69,6 +69,6 @@ public class Skill1 : Abillity
 
     public override void Execute()
     {
-        animComms.RequestPlayAnimation((int)BaseAnimEnums.SKILL1, 0, true, false);
+        animComms.RequestPlayAnimation((int)BossAnimEnums.SKILL1, 0, true, false);
     }
 }

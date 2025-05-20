@@ -18,7 +18,7 @@ public class GenericAnimationEvents : MonoBehaviour
     public void OnAnimationEndEvent(int animType)
     {
         if (animComms == null) { Debug.LogError("No anim comms!"); return; }
-        animComms.OnAnimationEnds((int)AnimationTypes.Attack);
+        animComms.OnAnimationEnds((int)AnimationEventTypes.AttackEvent);
     }
 
 

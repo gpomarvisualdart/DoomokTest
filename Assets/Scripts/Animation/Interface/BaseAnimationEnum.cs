@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum BaseAnimEnums
+public enum BossAnimEnums
 {
     IDLE,
     ATTACK1,
@@ -19,5 +19,24 @@ public enum BaseAnimEnums
     JUMP,
     LAND,
     DEATH,
+    NONE
+}
+
+public enum GenericAnimEnums
+{
+    IDLE,
+    WALKFWD,
+    WALKBCK,
+    DASH,
+    JUMP,
+    FALLING,
+    LAND,
+    ATTACK1START,
+    ATTACK1END,
+    ATTACK2START,
+    ATTACK2END,
+    ATTACK3START, 
+    ATTACK3END,
+    AIRATTACK,
     NONE
 }

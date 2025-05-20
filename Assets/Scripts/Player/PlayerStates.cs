@@ -7,6 +7,6 @@ public enum PlayerStates
 {
     Idle,
     Moving,
-    Airborne,
+    Attacking,
     Dashing
 }
