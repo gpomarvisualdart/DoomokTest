@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class Skill1 : Abillity
 {
+
     private LogicBoss lgcBoss;
     private IGenericAbillityRequests abillityRequests;
     private AnimationComms animComms;
@@ -43,12 +44,12 @@ public class Skill1 : Abillity
                 break;
             case 1:
                 if (abillityRequests == null) return;
-                abillityRequests.RequestHitbox(true, 10f, 25f);
+                abillityRequests.RequestHitbox(true, power, 25f);
                 //Debug.Log("Hit box on!");
                 break;
             case 2:
                 if (abillityRequests == null) return;
-                abillityRequests.RequestHitbox(false, 10f, 25f);
+                abillityRequests.RequestHitbox(false, power, 25f);
                 //Debug.Log("Hit box is off!");
                 break;
             case 3:
@@ -69,6 +70,6 @@ public class Skill1 : Abillity
 
     public override void Execute()
     {
-        animComms.RequestPlayAnimation((int)BossAnimEnums.SKILL1, 0, true, false);
+        animComms.RequestPlayAnimation((int)BossAnimEnums.SKILL1, 0, 0f, true, false);
     }
 }

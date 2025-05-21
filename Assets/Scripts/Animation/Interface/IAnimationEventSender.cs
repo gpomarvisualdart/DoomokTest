@@ -6,7 +6,7 @@ using UnityEngine;
 public interface IAnimationEventSender
 {
     public event EventHandler<PlayAnimationEventArgs> PlayAnimation;
-    public class PlayAnimationEventArgs : EventArgs { public int animIndex; public int animHashIndex; public bool isLock; public bool canPass; }
+    public class PlayAnimationEventArgs : EventArgs { public int animIndex; public int animHashIndex; public float fade; public bool isLock; public bool canPass; }
 
     public event EventHandler<AnimationEndsEventArgs> AnimationEndsEvent;
     public class AnimationEndsEventArgs : EventArgs { public int animType; }

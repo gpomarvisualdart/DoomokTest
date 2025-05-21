@@ -28,21 +28,21 @@ public static class AnimationIndexes
 
         new int[]  //GenericAnimations
         {
-            Animator.StringToHash("Idle"),
-            Animator.StringToHash("WalkFWD"),
-            Animator.StringToHash("WalkBCK"),
-            Animator.StringToHash("Dash"),
-            Animator.StringToHash("Jump"),
-            Animator.StringToHash("Falling"),
-            Animator.StringToHash("Land"),
-            Animator.StringToHash("Attack1Start"),
-            Animator.StringToHash("Attack1End"),
-            Animator.StringToHash("Attack2Start"),
-            Animator.StringToHash("Attack2End"),
-            Animator.StringToHash("Attack3Start"),
-            Animator.StringToHash("Attack3End"),
-            Animator.StringToHash("AttackAir"),
-            1000
+            Animator.StringToHash("Idle"), //0
+            Animator.StringToHash("WalkFWD"), //1
+            Animator.StringToHash("WalkBCK"), //2
+            Animator.StringToHash("Dash"), //3
+            Animator.StringToHash("Jump"), //4
+            Animator.StringToHash("Falling"), //5
+            Animator.StringToHash("Land"), //6
+            Animator.StringToHash("Attack1Start"), //7
+            Animator.StringToHash("Attack1End"), //8
+            Animator.StringToHash("Attack2Start"), //9
+            Animator.StringToHash("Attack2End"), //10
+            Animator.StringToHash("Attack3Start"), //11
+            Animator.StringToHash("Attack3End"), //12
+            Animator.StringToHash("AttackAir"), //13
+            1000 //14
         }
     };
 }

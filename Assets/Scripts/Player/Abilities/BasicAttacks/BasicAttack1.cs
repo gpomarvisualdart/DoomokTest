@@ -25,18 +25,27 @@ public class BasicAttack1 : Abillity
         switch(index)
         {
             default:
-                Debug.LogError("No index!");
+                Debug.LogError("No AnimEvents index!");
                 break;
-            
+
             case 0:
                 abillityRequests.RequestMovement(transform.forward, 10f, 0.1f, false, null);
                 break;
             case 1:
-
+                if (lgcPlr == null) return;
+                lgcPlr.ActivateHitbox(true, power, 0f);
                 break;
             case 2:
                 abillityRequests.RequestStopMovement();
                 break;
+            case 3:
+                if (lgcPlr == null) return;
+                lgcPlr.ActivateHitbox(false, power, 0f);
+                break;
+            case 4:
+                AttackEnds();
+                break; 
+
 
         }
     }
@@ -44,12 +53,12 @@ public class BasicAttack1 : Abillity
 
     public override void AttackEnds()
     {
-        throw new System.NotImplementedException();
+        lgcPlr.AttackEnds();
     }
 
 
     public override void Execute()
     {
-        animComms.RequestPlayAnimation((int)GenericAnimEnums.ATTACK1START, 1, true, false);
+        animComms.RequestPlayAnimation((int)GenericAnimEnums.ATTACK1START, 1, 0f, true, false);
     }
 }

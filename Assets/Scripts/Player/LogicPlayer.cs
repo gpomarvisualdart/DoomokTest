@@ -6,21 +6,27 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
 {
     InputManager inputManager;
     Rigidbody rb;
-    PlayerStates currentState;
+    [SerializeField] PlayerStates currentState;
     IEntityHealthController healthController;
     AnimationComms animComms;
 
     int numOfJumpsMidAir = 1;
     int currentCombo;
-    int maxCombos = 2;
+    int maxCombos;
     int playerLayer;
     int enemyLayer;
 
-    Abillity currentAbillity;
+    [SerializeField] Abillity currentAbillity;
 
     [SerializeField] List<Abillity> basicAttacks = new List<Abillity>();
 
+    [SerializeField] Transform Hitbox;
+
+    IHitboxController hitboxController;
+
     public Transform GetPlayerTransform() { return transform; }
+
+    bool canCombo = false;
 
     private void OnEnable()
     {
@@ -32,11 +38,15 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
         inputManager.JumpEventSender += JumpEventReceiver;
         inputManager.DashEventSender += DashEventReceiver;
 
+        canCombo = false;
+        maxCombos = basicAttacks.Count < 1 ? 0 : basicAttacks.Count - 1;
         rb = GetComponent<Rigidbody>();
         animComms = GetComponentInChildren<AnimationComms>();
         playerLayer = LayerMask.NameToLayer("Player");
         enemyLayer = LayerMask.NameToLayer("Enemies");
         healthController = TryGetComponent(out IEntityHealthController ieh) ? ieh : null;
+
+        hitboxController = Hitbox.TryGetComponent(out IHitboxController hc) ? hc : null;
 
         animComms.AnimationTriggerEvent += AnimationTriggerEventReceiver;
     }
@@ -60,9 +70,9 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
         if (CO_OnKnockback != null) return;
         if (numOfJumpsMidAir < 1) return;
         if (CO_EarlyJumpBoost != null) StopCoroutine(CO_EarlyJumpBoost);
-        numOfJumpsMidAir--;
         rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
         CO_EarlyJumpBoost = StartCoroutine(EarlyJumpBoost());
+        numOfJumpsMidAir--;
     }
     Coroutine CO_EarlyJumpBoost;
     IEnumerator EarlyJumpBoost()
@@ -83,10 +93,11 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
 
     private void AttackEventReceiver(object sender, System.EventArgs e)
     {
-        if (currentState == PlayerStates.Dashing) return;
+        if (currentState == PlayerStates.Dashing || CO_Dashing != null) return;
         if (basicAttacks.Count < 1) return;
+        if (currentAbillity != null && canCombo == false) return;
         currentState = PlayerStates.Attacking;
-        currentAbillity = basicAttacks[0];
+        currentAbillity = basicAttacks[currentCombo];
         currentAbillity.Execute();
     }
 
@@ -94,6 +105,8 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
     public void AttackEnds()
     {
         currentAbillity = null;
+        canCombo = false;
+        currentCombo = 0;
         currentState = PlayerStates.Idle;
     }
 
@@ -135,11 +148,18 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
     }
 
 
+    public void ActivateHitbox(bool turnOn, float power, float knockBackPwr)
+    {
+        if (hitboxController == null) return;
+        hitboxController.HitboxActivation(turnOn, power, knockBackPwr);
+    }
+
 
     private void DashEventReceiver(object sender, System.EventArgs e)
     {
         if (CO_OnKnockback != null) return;
         if (currentState == PlayerStates.Dashing || CO_Dashing != null) return;
+        AttackEnds();
         currentState = PlayerStates.Dashing;
         CO_Dashing = StartCoroutine(DashDuration());
     }
@@ -155,11 +175,10 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
 
         currentCombo = 0;
         currentAbillity = null;
-        animComms.RequestPlayAnimation((int)GenericAnimEnums.DASH, 1, true, true);
+        animComms.RequestPlayAnimation((int)GenericAnimEnums.DASH, 1, 0f, true, true);
         rb.velocity += transform.forward * 25f;
         while (flt_Count < flt_Length)
         {
-            //if (flt_Count < 0.27f) rb.MovePosition(transform.position + transform.forward * 200f * Time.deltaTime);
             if (flt_Count > 0.3f && !b_dashEnded)
             { currentState = PlayerStates.Idle; rb.velocity = Vector3.zero; b_dashEnded = true; }
             if (flt_Count > 0.5f) Physics.IgnoreLayerCollision(playerLayer, enemyLayer, false);
@@ -175,27 +194,31 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
         if (CO_OnKnockback != null) return;
         if (currentState == PlayerStates.Dashing || currentState == PlayerStates.Attacking) return;
         var vect2_MoveDir = inputManager.GetMovementAxis();
-        if (vect2_MoveDir == Vector2.zero && GroundCheck() == true) { animComms.RequestPlayAnimation((int)GenericAnimEnums.IDLE, 1, false, false); return; }
+        if (vect2_MoveDir == Vector2.zero && GroundCheck() == true) { animComms.RequestPlayAnimation((int)GenericAnimEnums.IDLE, 1, 0, false, false); return; }
 
         var vect3_MoveDir = new Vector3(vect2_MoveDir.x, 0, 0);
         rb.MovePosition(rb.position + vect3_MoveDir * 6.5f * Time.fixedDeltaTime);
         Vector3 lookDir = new Vector3 (transform.position.x + vect3_MoveDir.x, transform.position.y, transform.position.z);
         transform.LookAt(lookDir);
-        animComms.RequestPlayAnimation((int)GenericAnimEnums.WALKFWD, 1, false, false);
+        animComms.RequestPlayAnimation((int)GenericAnimEnums.WALKFWD, 1, 0,false, false);
 
     }
 
 
     private bool GroundCheck()
     {
-        bool onGround = Physics.Raycast((transform.position + transform.up), Vector3.down, 1.1f);
+        bool onGround = Physics.Raycast(transform.position + transform.up * (transform.localScale.y/2), Vector3.down, transform.localScale.y/2);
         if (onGround)
         {
             numOfJumpsMidAir = 1;
+
+
             return true;
         }
         else
-        return false; 
+        {
+            return false; 
+        } 
     }
 
 
@@ -234,12 +257,22 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
 
     private void AnimationTriggerEventReceiver(object sender, IAnimationEventSender.AnimationEventTriggerArgs e)
     {
-        if (e.animtype == (int)AnimationEventTypes.LostAttackCombo)
+        if (e.animtype == (int)AnimationEventTypes.AttackCombo)
         {
-            currentCombo = 0;
+            if (e.index == 1)
+            {
+                canCombo = true;
+                if (maxCombos > currentCombo) { currentCombo++; }
+            }
+            else
+            {
+                canCombo = false;
+                currentCombo = 0;
+            }
         }
         if (e.animtype == (int)AnimationEventTypes.AttackEvent)
         {
+            if (currentAbillity == null) return;
             currentAbillity.AnimEvents(e.index);
         }
     }

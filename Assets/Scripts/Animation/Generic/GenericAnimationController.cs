@@ -34,11 +34,11 @@ public class GenericAnimationController : MonoBehaviour, IAnimationController
 
     public void InitializeAnimation(int animIndex, bool isLock, Animator animator)
     {
-        ChangeAnimations(animIndex, defaultAnimHashArray, false, false, animator);
+        ChangeAnimations(animIndex, defaultAnimHashArray, 0f, false, false, animator);
     }
 
 
-    public void ChangeAnimations(int animIndex, int animHashIndex, bool isLock, bool canPass, Animator animator)
+    public void ChangeAnimations(int animIndex, int animHashIndex, float fade, bool isLock, bool canPass, Animator animator)
     {
         if (animator == null) return;
         if (animIndex == 1000)
@@ -50,7 +50,7 @@ public class GenericAnimationController : MonoBehaviour, IAnimationController
         }
         if (currentLockStatus && !canPass) return;
         if (currentAnimIndex == animIndex) return;
-        animator.CrossFade(AnimationIndexes.AnimationHashes[animHashIndex][animIndex], 0f, 0);
+        animator.CrossFade(AnimationIndexes.AnimationHashes[animHashIndex][animIndex], fade, 0);
         currentLockStatus = isLock;
         currentAnimIndex = animIndex;
     }
@@ -58,29 +58,31 @@ public class GenericAnimationController : MonoBehaviour, IAnimationController
 
     private void PlayAnimationReceiver(object sender, IAnimationEventSender.PlayAnimationEventArgs e)
     {
-        ChangeAnimations(e.animIndex, e.animHashIndex, e.isLock, e.canPass, animator);
+        ChangeAnimations(e.animIndex, e.animHashIndex, e.fade, e.isLock, e.canPass, animator);
     }
 
 
     public void EndAnimation(string dataParse)
     {
-        //Parse holds Animation type, AnimHashArray of choice to play from, is the animation locked, and whether it can bypass locked animations. All are seperated with a ':'
+        //Parse holds Animation type, AnimHashArray of choice to play from, fade in time, is the animation locked, and whether it can bypass locked animations. All are seperated with a ':'
         //1000 will account as no animation and will play idle animation instead
 
         int animIndex;
         int animHashArray;
+        float fade;
         bool isLock;
         bool canBypass;
 
         var splitParse = dataParse.Split(":");
-        if (splitParse.Length < 4 || splitParse.Length > 4) { Debug.LogError($"Data parse length is not valid! It needs to be 4 and not {splitParse.Length}!"); return; }
+        if (splitParse.Length < 5 || splitParse.Length > 5) { Debug.LogError($"Data parse length is not valid! It needs to be 4 and not {splitParse.Length}!"); return; }
 
         if (!int.TryParse(splitParse[0], out animIndex)) return;
         if (!int.TryParse(splitParse[1], out animHashArray)) return;
-        if (!bool.TryParse(splitParse[2], out isLock)) return;
-        if (!bool.TryParse(splitParse[3], out canBypass)) return;
+        if (!float.TryParse(splitParse[2], out fade)) return;
+        if (!bool.TryParse(splitParse[3], out isLock)) return;
+        if (!bool.TryParse(splitParse[4], out canBypass)) return;
 
 
-        ChangeAnimations(animIndex, animHashArray, isLock, canBypass, animator);
+        ChangeAnimations(animIndex, animHashArray,fade, isLock, canBypass, animator);
     }
 }
