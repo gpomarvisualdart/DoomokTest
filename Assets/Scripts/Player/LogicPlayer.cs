@@ -176,6 +176,9 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
         currentCombo = 0;
         currentAbillity = null;
         animComms.RequestPlayAnimation((int)GenericAnimEnums.DASH, 1, 0f, true, true);
+
+        var vect3_Direction = transform.position + (Vector3)inputManager.GetMovementAxis();
+
         rb.velocity += transform.forward * 25f;
         while (flt_Count < flt_Length)
         {
