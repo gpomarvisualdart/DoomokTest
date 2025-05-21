@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class LogicBoss : MonoBehaviour, IGenericAbillityRequests
+public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
 {
     LogicPlayer plr;
     AnimationComms animComms;
@@ -178,6 +178,7 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests
 
     public void RequestMovement(Vector3 direction, float spd, float duration, bool isDynamic, Dictionary<MovementAdditionalInfo, int> additionalInfo)
     {
+        //rb.isKinematic = true;
         if (!isDynamic)
         {
             StaticMovement(direction, spd, additionalInfo);
@@ -238,10 +239,16 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests
     public void RequestStopMovement()
     {
         rb.velocity = Vector3.zero;
+        //rb.isKinematic = false;
         if (CO_OnDynamicMovement != null) { StopCoroutine(CO_OnDynamicMovement); CO_OnDynamicMovement = null; }
         Physics.IgnoreLayerCollision(enemyLayer, playerLayer, false);
     }
 
+
+    public void DealDamage(float damage, Vector3 dir, float knckBackPwr)
+    {
+        Debug.Log("Boss hit!");
+    }
 
     private void StateController()
     {
@@ -285,8 +292,8 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests
         {
             var flt_DotDir = Vector3.Dot(transform.forward, direction);
             if (animComms == null) { Debug.LogError("No animation comms"); return; }
-            if (flt_DotDir > 0f) animComms.RequestPlayAnimation((int)BossAnimEnums.WALKFWD, 0, false, false);
-            else animComms.RequestPlayAnimation((int)BossAnimEnums.WALKBCK, 0, false, false);
+            if (flt_DotDir > 0f) animComms.RequestPlayAnimation((int)BossAnimEnums.WALKFWD, 0, 0, false, false);
+            else animComms.RequestPlayAnimation((int)BossAnimEnums.WALKBCK, 0, 0, false, false);
         }
     }
 

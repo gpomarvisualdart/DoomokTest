@@ -36,7 +36,7 @@ public class D_Attack1 : Abillity
                 break;
             case 1:
                 if (abillityRequests == null) return;
-                abillityRequests.RequestHitbox(true, 7.5f, 7.5f);
+                abillityRequests.RequestHitbox(true, power, 7.5f);
                 break;
             case 2:
                 if (abillityRequests == null) return;
@@ -44,7 +44,7 @@ public class D_Attack1 : Abillity
                 break;
             case 3:
                 if (abillityRequests == null) return;
-                abillityRequests.RequestHitbox(false, 7.5f, 7.5f);
+                abillityRequests.RequestHitbox(false, power, 7.5f);
                 break;
              case 4:
                 AttackEnds();
@@ -56,7 +56,7 @@ public class D_Attack1 : Abillity
 
     public override void Execute()
     {
-        animComms.RequestPlayAnimation((int)BossAnimEnums.ATTACK1, 0, true, true);
+        animComms.RequestPlayAnimation((int)BossAnimEnums.ATTACK1, 0, 0f, true, true);
     }
 
 

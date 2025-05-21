@@ -1,0 +1,733 @@
+fileFormatVersion: 2
+guid: bcf334f6fdc477049a11ceaacf45de9a
+TextureImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 12
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 0
+    wrapV: 0
+    wrapW: 0
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 0
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Plant01_Atlas_3
+      rect:
+        serializedVersion: 2
+        x: 12
+        y: 271
+        width: 117
+        height: 231
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8107daa57d16fdd49a8d983de762c4d8
+      internalID: 16851964
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Plant01_Atlas_4
+      rect:
+        serializedVersion: 2
+        x: 158
+        y: 350
+        width: 149
+        height: 148
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 852cb71ca59008443b3a40c6bbf61247
+      internalID: 865460814
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Plant01_Atlas_5
+      rect:
+        serializedVersion: 2
+        x: 339
+        y: 350
+        width: 148
+        height: 148
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 50eacee32faac4249a52492c260aea32
+      internalID: 1761294788
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Plant01_Atlas_6
+      rect:
+        serializedVersion: 2
+        x: 533
+        y: 269
+        width: 12
+        height: 216
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 99a12bd11521a034c9ab4791a4eef080
+      internalID: 1271528434
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Plant01_Atlas_7
+      rect:
+        serializedVersion: 2
+        x: 591
+        y: 269
+        width: 15
+        height: 216
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c1771c6ddac2fdd4eaf5ce65d20b9f8f
+      internalID: -1334040022
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Plant01_Atlas_8
+      rect:
+        serializedVersion: 2
+        x: 649
+        y: 269
+        width: 10
+        height: 216
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5544324d048058f448ec00ffef264074
+      internalID: 571040251
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Plant01_Atlas_9
+      rect:
+        serializedVersion: 2
+        x: 699
+        y: 269
+        width: 117
+        height: 192
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 93bf96c25b43ac9478c387ea1a861095
+      internalID: 705772554
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Plant01_Atlas_10
+      rect:
+        serializedVersion: 2
+        x: 841
+        y: 442
+        width: 45
+        height: 48
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d99518e8ffa7e8f40b8f57b31908bd94
+      internalID: 1581785335
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Plant01_Atlas_11
+      rect:
+        serializedVersion: 2
+        x: 910
+        y: 441
+        width: 31
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7c238f63276f01842989ee6ade8bd097
+      internalID: -1032908426
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Plant01_Atlas_12
+      rect:
+        serializedVersion: 2
+        x: 951
+        y: 441
+        width: 44
+        height: 49
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5c28b7c27dfb17a4cb0e9fc92f82bb8c
+      internalID: -616694904
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Plant01_Atlas_13
+      rect:
+        serializedVersion: 2
+        x: 832
+        y: 369
+        width: 62
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 29d03bc9a40bb0c48b99850bf2bda1f2
+      internalID: 169730327
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Plant01_Atlas_14
+      rect:
+        serializedVersion: 2
+        x: 903
+        y: 373
+        width: 42
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6b978e82d0bef9c4dad0147c38ee6153
+      internalID: -629094159
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Plant01_Atlas_15
+      rect:
+        serializedVersion: 2
+        x: 953
+        y: 369
+        width: 51
+        height: 55
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 851196128b1e0c54e9d8d9841c0f3cd7
+      internalID: -1374826233
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Plant01_Atlas_16
+      rect:
+        serializedVersion: 2
+        x: 156
+        y: 177
+        width: 153
+        height: 149
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4db1db88da9449641a62aea2064529df
+      internalID: 1641966980
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Plant01_Atlas_17
+      rect:
+        serializedVersion: 2
+        x: 351
+        y: 189
+        width: 125
+        height: 126
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cd9dc48777329d44d9751ae21eb571a0
+      internalID: -1989561989
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Plant01_Atlas_18
+      rect:
+        serializedVersion: 2
+        x: 841
+        y: 279
+        width: 47
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8172438777a0f5945b2ebb52a212e924
+      internalID: 1569986708
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Plant01_Atlas_19
+      rect:
+        serializedVersion: 2
+        x: 925
+        y: 277
+        width: 77
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 03f7d8ee4eb806d4f92c3c9ad5bc00ce
+      internalID: -1069032062
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Plant01_Atlas_20
+      rect:
+        serializedVersion: 2
+        x: 20
+        y: 33
+        width: 34
+        height: 184
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fc1a973fc1194864986e083fcfada12c
+      internalID: -484657874
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Plant01_Atlas_21
+      rect:
+        serializedVersion: 2
+        x: 82
+        y: 38
+        width: 36
+        height: 190
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 30d6537354151c34b98c6c3e688b5460
+      internalID: -133788053
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Plant01_Atlas_22
+      rect:
+        serializedVersion: 2
+        x: 149
+        y: 18
+        width: 154
+        height: 136
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bc719f6852d18634ab1ffb1535e847e4
+      internalID: -2109877973
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Plant01_Atlas_23
+      rect:
+        serializedVersion: 2
+        x: 342
+        y: 26
+        width: 142
+        height: 124
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9d228c372845a5144b2aa748484ff53e
+      internalID: 901481127
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Plant01_Atlas_24
+      rect:
+        serializedVersion: 2
+        x: 534
+        y: 23
+        width: 11
+        height: 216
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 93bbbc4f51f005249aae3eac22b0da3f
+      internalID: 54469351
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Plant01_Atlas_25
+      rect:
+        serializedVersion: 2
+        x: 591
+        y: 23
+        width: 15
+        height: 216
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 03838fd0a5aa3624a965a2240213c6d1
+      internalID: -1456791176
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Plant01_Atlas_26
+      rect:
+        serializedVersion: 2
+        x: 649
+        y: 23
+        width: 10
+        height: 216
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2b8a791db5b68aa498dbfa383b6214c6
+      internalID: -1941211465
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Plant01_Atlas_27
+      rect:
+        serializedVersion: 2
+        x: 695
+        y: 14
+        width: 35
+        height: 234
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 14374044370c4cd40a14ca4c3e02359b
+      internalID: 102530477
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Plant01_Atlas_28
+      rect:
+        serializedVersion: 2
+        x: 783
+        y: 19
+        width: 34
+        height: 229
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1ed50fb6b8d4c1340972d20ccc4bee3e
+      internalID: -241559702
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Plant01_Atlas_29
+      rect:
+        serializedVersion: 2
+        x: 856
+        y: 14
+        width: 49
+        height: 240
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2c18d8a5d1653e049b3e6c9e67a4402a
+      internalID: -585012
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Plant01_Atlas_30
+      rect:
+        serializedVersion: 2
+        x: 947
+        y: 19
+        width: 45
+        height: 234
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: adc0cdc67f1635c41a2ced808cb024ed
+      internalID: -1159638712
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 1537655665
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    nameFileIdTable:
+      Plant01_Atlas_0: 1038677810
+      Plant01_Atlas_1: -705331342
+      Plant01_Atlas_10: 1581785335
+      Plant01_Atlas_11: -1032908426
+      Plant01_Atlas_12: -616694904
+      Plant01_Atlas_13: 169730327
+      Plant01_Atlas_14: -629094159
+      Plant01_Atlas_15: -1374826233
+      Plant01_Atlas_16: 1641966980
+      Plant01_Atlas_17: -1989561989
+      Plant01_Atlas_18: 1569986708
+      Plant01_Atlas_19: -1069032062
+      Plant01_Atlas_2: -409141993
+      Plant01_Atlas_20: -484657874
+      Plant01_Atlas_21: -133788053
+      Plant01_Atlas_22: -2109877973
+      Plant01_Atlas_23: 901481127
+      Plant01_Atlas_24: 54469351
+      Plant01_Atlas_25: -1456791176
+      Plant01_Atlas_26: -1941211465
+      Plant01_Atlas_27: 102530477
+      Plant01_Atlas_28: -241559702
+      Plant01_Atlas_29: -585012
+      Plant01_Atlas_3: 16851964
+      Plant01_Atlas_30: -1159638712
+      Plant01_Atlas_4: 865460814
+      Plant01_Atlas_5: 1761294788
+      Plant01_Atlas_6: 1271528434
+      Plant01_Atlas_7: -1334040022
+      Plant01_Atlas_8: 571040251
+      Plant01_Atlas_9: 705772554
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

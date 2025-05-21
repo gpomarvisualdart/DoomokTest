@@ -10,9 +10,9 @@ public class AnimationComms : MonoBehaviour, IAnimationEventSender
     public event EventHandler<IAnimationEventSender.AnimationEventTriggerArgs> AnimationTriggerEvent;
 
 
-    public void RequestPlayAnimation(int animIndex, int animHashIndex, bool isLock, bool canPass)
+    public void RequestPlayAnimation(int animIndex, int animHashIndex, float fade, bool isLock, bool canPass)
     {
-        PlayAnimation?.Invoke(this, new IAnimationEventSender.PlayAnimationEventArgs { animIndex = animIndex, animHashIndex = animHashIndex, isLock = isLock, canPass = canPass });
+        PlayAnimation?.Invoke(this, new IAnimationEventSender.PlayAnimationEventArgs { animIndex = animIndex, animHashIndex = animHashIndex, fade = fade, isLock = isLock, canPass = canPass });
     }
 
 
