@@ -9,5 +9,6 @@ public enum BossStates
     Aggro,
     WalkForwardTracking,
     WalkBackwardTracking,
-    Attack
+    Attack,
+    Die
 }

@@ -10,6 +10,9 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
     IEntityHealthController healthController;
     AnimationComms animComms;
 
+    Vector3 MoveDir;
+    float airForce;
+    float maxAirSpd = 6f;
     int numOfJumpsMidAir = 1;
     int currentCombo;
     int maxCombos;
@@ -41,6 +44,8 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
         canCombo = false;
         maxCombos = basicAttacks.Count < 1 ? 0 : basicAttacks.Count - 1;
         rb = GetComponent<Rigidbody>();
+        rb.isKinematic = true;
+        airForce = rb.mass * 30f;
         animComms = GetComponentInChildren<AnimationComms>();
         playerLayer = LayerMask.NameToLayer("Player");
         enemyLayer = LayerMask.NameToLayer("Enemies");
@@ -70,8 +75,9 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
         if (CO_OnKnockback != null) return;
         if (numOfJumpsMidAir < 1) return;
         if (CO_EarlyJumpBoost != null) StopCoroutine(CO_EarlyJumpBoost);
-        rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
         CO_EarlyJumpBoost = StartCoroutine(EarlyJumpBoost());
+        rb.isKinematic = false;
+        rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
         numOfJumpsMidAir--;
     }
     Coroutine CO_EarlyJumpBoost;
@@ -79,21 +85,26 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
     {
         var flt_count = 0f;
         var flt_time = 0.2f;
-        rb.velocity += new Vector3(0f, 6.5f, 0f);
-        while (flt_count < flt_time)
+        rb.isKinematic = false;
+        rb.AddForce(Vector3.up * 7.5f, ForceMode.VelocityChange);
+
+       while (flt_count < flt_time)
         {
-            rb.velocity += new Vector3(0f, 50f * Time.fixedDeltaTime, 0f);
+            //rb.isKinematic = false;
+            //rb.velocity += new Vector3(0f, 50f * Time.fixedDeltaTime, 0f);
             flt_count += Time.fixedDeltaTime;
             yield return new WaitForFixedUpdate();
         }
         rb.velocity = new Vector3(rb.velocity.x, 4f, rb.velocity.z);
+
         CO_EarlyJumpBoost = null;
+        yield break;
     }
 
 
     private void AttackEventReceiver(object sender, System.EventArgs e)
     {
-        if (currentState == PlayerStates.Dashing || CO_Dashing != null) return;
+        if (currentState == PlayerStates.Dashing || CO_Dashing != null || CO_OnKnockback != null) return;
         if (basicAttacks.Count < 1) return;
         if (currentAbillity != null && canCombo == false) return;
         currentState = PlayerStates.Attacking;
@@ -107,6 +118,7 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
         currentAbillity = null;
         canCombo = false;
         currentCombo = 0;
+        ActivateHitbox(false, 0f, 0f);
         currentState = PlayerStates.Idle;
     }
 
@@ -124,6 +136,7 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
     }
     private void StaticMovement(Vector3 dir, float spd, Dictionary<MovementAdditionalInfo, int> addInfo)
     {
+        rb.isKinematic = false;
         rb.velocity += dir * spd;
     }
 
@@ -145,6 +158,8 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
     public void RequestStopMovement()
     {
         rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        rb.isKinematic = true;
     }
 
 
@@ -161,6 +176,7 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
         if (currentState == PlayerStates.Dashing || CO_Dashing != null) return;
         AttackEnds();
         currentState = PlayerStates.Dashing;
+        rb.isKinematic = false;
         CO_Dashing = StartCoroutine(DashDuration());
     }
 
@@ -177,36 +193,74 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
         currentAbillity = null;
         animComms.RequestPlayAnimation((int)GenericAnimEnums.DASH, 1, 0f, true, true);
 
-        var vect3_Direction = transform.position + (Vector3)inputManager.GetMovementAxis();
+        var vect3_Direction = transform.position + MoveDir;
 
-        rb.velocity += transform.forward * 25f;
-        while (flt_Count < flt_Length)
+        if (MoveDir == Vector3.zero)
         {
-            if (flt_Count > 0.3f && !b_dashEnded)
-            { currentState = PlayerStates.Idle; rb.velocity = Vector3.zero; b_dashEnded = true; }
-            if (flt_Count > 0.5f) Physics.IgnoreLayerCollision(playerLayer, enemyLayer, false);
-            flt_Count += Time.fixedDeltaTime;
-            yield return new WaitForFixedUpdate();
+            var vect3_lookDir = new Vector3(transform.position.x + MoveDir.x, transform.position.y, transform.position.z);
+            transform.LookAt(vect3_lookDir);
+            rb.velocity += transform.forward * 25f;
+            while (flt_Count < flt_Length)
+            {
+                if (flt_Count > 0.3f && !b_dashEnded)
+                { currentState = PlayerStates.Idle; rb.velocity = Vector3.zero; b_dashEnded = true; }
+                if (flt_Count > 0.5f) Physics.IgnoreLayerCollision(playerLayer, enemyLayer, false);
+                flt_Count += Time.fixedDeltaTime;
+                yield return new WaitForFixedUpdate();
+            }
         }
+        else
+        {
+            var vect3_lookDir = new Vector3(transform.position.x + MoveDir.x, transform.position.y, transform.position.z);
+            transform.LookAt(vect3_lookDir);
+            rb.velocity += MoveDir * 25f;
+            //Debug.Log(rb.velocity);
+            while (flt_Count < flt_Length)
+            {
+                if (flt_Count > 0.3f && !b_dashEnded)
+                { currentState = PlayerStates.Idle; rb.velocity = Vector3.zero; b_dashEnded = true; }
+                if (flt_Count > 0.5f) Physics.IgnoreLayerCollision(playerLayer, enemyLayer, false);
+                flt_Count += Time.fixedDeltaTime;
+                yield return new WaitForFixedUpdate();
+            }
+        }
+
         CO_Dashing = null;
     }
 
 
-    private void Movement()
+    private void GroundControl()
     {
+        MoveDir = new Vector3(inputManager.GetMovementAxis().x, inputManager.GetMovementAxis().y, 0f);
         if (CO_OnKnockback != null) return;
+        if (!GroundCheck()) return;
         if (currentState == PlayerStates.Dashing || currentState == PlayerStates.Attacking) return;
-        var vect2_MoveDir = inputManager.GetMovementAxis();
-        if (vect2_MoveDir == Vector2.zero && GroundCheck() == true) { animComms.RequestPlayAnimation((int)GenericAnimEnums.IDLE, 1, 0, false, false); return; }
+        if (MoveDir == Vector3.zero && GroundCheck() == true) { animComms.RequestPlayAnimation((int)GenericAnimEnums.IDLE, 1, 0, false, false); return; }
 
-        var vect3_MoveDir = new Vector3(vect2_MoveDir.x, 0, 0);
-        rb.MovePosition(rb.position + vect3_MoveDir * 6.5f * Time.fixedDeltaTime);
-        Vector3 lookDir = new Vector3 (transform.position.x + vect3_MoveDir.x, transform.position.y, transform.position.z);
-        transform.LookAt(lookDir);
+        rb.MovePosition(rb.position + MoveDir * 6.5f * Time.fixedDeltaTime);
+        var vect3_lookDir = new Vector3 (transform.position.x + MoveDir.x, transform.position.y, transform.position.z);
+        transform.LookAt(vect3_lookDir);
         animComms.RequestPlayAnimation((int)GenericAnimEnums.WALKFWD, 1, 0,false, false);
 
     }
 
+
+    private void AirControl()
+    {
+        if (CO_OnKnockback != null) return;
+        if (currentState == PlayerStates.Dashing || currentState == PlayerStates.Attacking) return;
+        if (GroundCheck()) return;
+        if (MoveDir == Vector3.zero) rb.velocity = new Vector3(0f, rb.velocity.y, 0f);
+        var vect3_airMove = new Vector3(MoveDir.x, 0f, 0f);
+
+        if (Mathf.Abs(rb.velocity.x) < maxAirSpd)
+        {
+            rb.AddForce(vect3_airMove * airForce, ForceMode.Force);
+        }
+        var vect3_lookDir = new Vector3(transform.position.x + MoveDir.x, transform.position.y, transform.position.z);
+        transform.LookAt(vect3_lookDir);            
+
+    }
 
     private bool GroundCheck()
     {
@@ -214,12 +268,14 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
         if (onGround)
         {
             numOfJumpsMidAir = 1;
-
+            if (!rb.isKinematic && currentState != PlayerStates.Dashing && CO_EarlyJumpBoost == null && currentState != PlayerStates.Attacking && CO_OnKnockback == null) { rb.isKinematic = true; }
 
             return true;
         }
         else
         {
+            if (rb.isKinematic) { rb.isKinematic = false; }
+
             return false; 
         } 
     }
@@ -239,6 +295,7 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
     public void KnockEntityBack(Vector3 direction, float power)
     {
         if (CO_OnKnockback != null) return;
+        currentState = PlayerStates.Idle;
         CO_OnKnockback = StartCoroutine(OnKnockback(direction, power));
     }
     Coroutine CO_OnKnockback;
@@ -246,6 +303,7 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
     {
         var flt_Count = 0f;
         var flt_Duration = 0.15f;
+        rb.isKinematic = false;
         rb.velocity += direction * power;
 
         while (flt_Count <= flt_Duration)
@@ -253,7 +311,8 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
             flt_Count += Time.fixedDeltaTime;
             yield return new WaitForFixedUpdate();
         }
-        rb.velocity = Vector3.zero;
+        if (!rb.isKinematic) rb.velocity = Vector3.zero;
+        currentCombo = 0;
         CO_OnKnockback = null;
     }
 
@@ -289,6 +348,7 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
 
     private void FixedUpdate()
     {
-        Movement();
+        GroundControl();
+        AirControl();
     }
 }

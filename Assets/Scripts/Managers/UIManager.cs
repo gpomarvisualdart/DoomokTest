@@ -6,7 +6,9 @@ public class UIManager : MonoBehaviour
 {
     public static UIManager instance;
     Canvas canvas;
+    [SerializeField] GameObject pauseMenu;
     HealthUIController healthUIController;
+    BossHealthUIController bossHealthUIController;
 
 
     private void Awake()
@@ -22,7 +24,8 @@ public class UIManager : MonoBehaviour
         {
             canvas = FindObjectOfType<Canvas>();
             healthUIController = canvas.gameObject.transform.GetComponentInChildren<HealthUIController>();
-            if (healthUIController == null) { Debug.LogError("No healthUIController found!"); return; } 
+            if (healthUIController == null) { Debug.LogError("No healthUIController found!"); return; }
+            bossHealthUIController = canvas.gameObject.transform.GetComponentInChildren<BossHealthUIController>();
         }
     }
 
@@ -31,5 +34,18 @@ public class UIManager : MonoBehaviour
     {
         if (healthUIController == null) {Debug.LogError("No healthUIController found!"); return; }
         healthUIController.ChangeHealthUIValue(newValue);
+    }
+
+
+    public void BossHealthChanged(float newValue)
+    {
+        if (bossHealthUIController == null) return;
+        bossHealthUIController.HealthChanged(newValue);
+    }
+
+
+    public void RequestPauseMenuActivation(bool request)
+    {
+        pauseMenu.SetActive(request);
     }
 }

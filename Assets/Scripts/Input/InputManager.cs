@@ -15,6 +15,7 @@ public class InputManager : MonoBehaviour
         input.Gameplay.Attack.performed += AttackReceiver;
         input.Gameplay.Jump.performed += JumpReceiver;
         input.Gameplay.Dash.performed += DashReceiver;
+        input.Gameplay.Pause.performed += PauseReceiver;
     }
 
 
@@ -25,6 +26,8 @@ public class InputManager : MonoBehaviour
             input.Gameplay.Disable();
             input.Gameplay.Attack.performed -= AttackReceiver;
             input.Gameplay.Jump.performed -= JumpReceiver;
+            input.Gameplay.Dash.performed -= DashReceiver;
+            input.Gameplay.Pause.performed -= PauseReceiver;
         }
     }
 
@@ -51,6 +54,11 @@ public class InputManager : MonoBehaviour
     private void DashReceiver(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
         DashEventSender?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void PauseReceiver(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    {
+        GameManager.instance.RequestPause();
     }
 
 
