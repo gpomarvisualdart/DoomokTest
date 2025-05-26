@@ -45,6 +45,7 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
     {
         rb = GetComponent<Rigidbody>();
         rb.isKinematic = true;
+        rb.velocity = Vector3.zero;
         healthController = TryGetComponent(out IEntityHealthController ieh) ? ieh : null;
         if (healthController == null) Debug.LogError("No health controller!");
         currentState = BossStates.WalkForwardTracking;

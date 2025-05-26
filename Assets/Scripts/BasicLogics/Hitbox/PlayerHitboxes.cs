@@ -17,11 +17,11 @@ public class PlayerHitboxes : MonoBehaviour, IHitboxController
         while (current != null)
         {
             plr = current.TryGetComponent(out LogicPlayer lb) ? lb : null;
-            if (plr != null) { Debug.Log("Found player logic!"); break; }
+            if (plr != null) { break; }
             current = current.parent;
         }
 
-        if (plr == null) { Debug.LogError("LogicBoss not found!"); return; }
+        if (plr == null) { return; }
         trigger = TryGetComponent(out Collider c) ? c : null;
         trigger.enabled = false;
     }

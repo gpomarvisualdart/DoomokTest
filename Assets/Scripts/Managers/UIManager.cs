@@ -5,7 +5,7 @@ using UnityEngine;
 public class UIManager : MonoBehaviour
 {
     public static UIManager instance;
-    Canvas canvas;
+    [SerializeField] GameObject canvas;
     [SerializeField] GameObject pauseMenu;
     HealthUIController healthUIController;
     BossHealthUIController bossHealthUIController;
@@ -22,11 +22,15 @@ public class UIManager : MonoBehaviour
     {
         if (canvas == null)
         {
-            canvas = FindObjectOfType<Canvas>();
             healthUIController = canvas.gameObject.transform.GetComponentInChildren<HealthUIController>();
             if (healthUIController == null) { Debug.LogError("No healthUIController found!"); return; }
             bossHealthUIController = canvas.gameObject.transform.GetComponentInChildren<BossHealthUIController>();
+            return;
         }
+
+        healthUIController = canvas.gameObject.transform.GetComponentInChildren<HealthUIController>();
+        if (healthUIController == null) { Debug.LogError("No healthUIController found!"); return; }
+        bossHealthUIController = canvas.gameObject.transform.GetComponentInChildren<BossHealthUIController>();
     }
 
 

@@ -44,7 +44,8 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
         canCombo = false;
         maxCombos = basicAttacks.Count < 1 ? 0 : basicAttacks.Count - 1;
         rb = GetComponent<Rigidbody>();
-        rb.isKinematic = true;
+        rb.velocity = Vector3.zero;
+        //rb.isKinematic = true;
         airForce = rb.mass * 30f;
         animComms = GetComponentInChildren<AnimationComms>();
         playerLayer = LayerMask.NameToLayer("Player");
@@ -91,7 +92,7 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
        while (flt_count < flt_time)
         {
             //rb.isKinematic = false;
-            //rb.velocity += new Vector3(0f, 50f * Time.fixedDeltaTime, 0f);
+            rb.velocity += new Vector3(0f, 50f * Time.fixedDeltaTime, 0f);
             flt_count += Time.fixedDeltaTime;
             yield return new WaitForFixedUpdate();
         }
@@ -136,7 +137,7 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
     }
     private void StaticMovement(Vector3 dir, float spd, Dictionary<MovementAdditionalInfo, int> addInfo)
     {
-        rb.isKinematic = false;
+        //rb.isKinematic = false;
         rb.velocity += dir * spd;
     }
 
@@ -159,7 +160,7 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
     {
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
-        rb.isKinematic = true;
+        //rb.isKinematic = true;
     }
 
 
@@ -176,7 +177,7 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
         if (currentState == PlayerStates.Dashing || CO_Dashing != null) return;
         AttackEnds();
         currentState = PlayerStates.Dashing;
-        rb.isKinematic = false;
+        //rb.isKinematic = false;
         CO_Dashing = StartCoroutine(DashDuration());
     }
 
@@ -268,13 +269,13 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
         if (onGround)
         {
             numOfJumpsMidAir = 1;
-            if (!rb.isKinematic && currentState != PlayerStates.Dashing && CO_EarlyJumpBoost == null && currentState != PlayerStates.Attacking && CO_OnKnockback == null) { rb.isKinematic = true; }
+            //if (!rb.isKinematic && currentState != PlayerStates.Dashing && CO_EarlyJumpBoost == null && currentState != PlayerStates.Attacking && CO_OnKnockback == null) { rb.isKinematic = true; }
 
             return true;
         }
         else
         {
-            if (rb.isKinematic) { rb.isKinematic = false; }
+            //if (rb.isKinematic) { rb.isKinematic = false; }
 
             return false; 
         } 

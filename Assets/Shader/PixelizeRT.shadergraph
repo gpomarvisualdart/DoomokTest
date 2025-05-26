@@ -2460,7 +2460,7 @@
     "m_StageCapability": 3,
     "m_BareResource": false,
     "m_Texture": {
-        "m_SerializedTexture": "{\"texture\":{\"instanceID\":0}}",
+        "m_SerializedTexture": "",
         "m_Guid": ""
     },
     "m_DefaultType": 0
@@ -2511,7 +2511,7 @@
     "hlslDeclarationOverride": 0,
     "m_Hidden": false,
     "m_Value": {
-        "m_SerializedTexture": "{\"texture\":{\"fileID\":8400000,\"guid\":\"3f23a35c47283fb40982f43e322e073a\",\"type\":2}}",
+        "m_SerializedTexture": "",
         "m_Guid": ""
     },
     "isMainTexture": false,
@@ -3562,7 +3562,7 @@
     "m_StageCapability": 3,
     "m_BareResource": false,
     "m_Texture": {
-        "m_SerializedTexture": "{\"texture\":{\"instanceID\":0}}",
+        "m_SerializedTexture": "",
         "m_Guid": ""
     },
     "m_DefaultType": 0
@@ -3976,7 +3976,7 @@
     "m_StageCapability": 3,
     "m_BareResource": false,
     "m_Texture": {
-        "m_SerializedTexture": "{\"texture\":{\"instanceID\":0}}",
+        "m_SerializedTexture": "",
         "m_Guid": ""
     },
     "m_DefaultType": 0
@@ -4418,7 +4418,7 @@
     "m_StageCapability": 3,
     "m_BareResource": false,
     "m_Texture": {
-        "m_SerializedTexture": "{\"texture\":{\"instanceID\":0}}",
+        "m_SerializedTexture": "",
         "m_Guid": ""
     },
     "m_DefaultType": 0
@@ -5297,7 +5297,7 @@
     "m_StageCapability": 3,
     "m_BareResource": false,
     "m_Texture": {
-        "m_SerializedTexture": "{\"texture\":{\"instanceID\":0}}",
+        "m_SerializedTexture": "",
         "m_Guid": ""
     },
     "m_DefaultType": 0
@@ -6130,7 +6130,7 @@
     "m_StageCapability": 3,
     "m_BareResource": false,
     "m_Texture": {
-        "m_SerializedTexture": "{\"texture\":{\"instanceID\":0}}",
+        "m_SerializedTexture": "",
         "m_Guid": ""
     },
     "m_DefaultType": 0
@@ -7028,7 +7028,7 @@
     "m_StageCapability": 3,
     "m_BareResource": false,
     "m_Texture": {
-        "m_SerializedTexture": "{\"texture\":{\"instanceID\":0}}",
+        "m_SerializedTexture": "",
         "m_Guid": ""
     },
     "m_DefaultType": 0
@@ -7568,7 +7568,7 @@
     "m_StageCapability": 3,
     "m_BareResource": false,
     "m_Texture": {
-        "m_SerializedTexture": "{\"texture\":{\"instanceID\":0}}",
+        "m_SerializedTexture": "",
         "m_Guid": ""
     },
     "m_DefaultType": 0
@@ -7687,8 +7687,8 @@
     "m_ObjectId": "a33983ef641b4923a56790ea7b704581",
     "m_Title": "ScreenWidth",
     "m_Position": {
-        "x": -4640.0,
-        "y": 985.0
+        "x": -4640.0009765625,
+        "y": 984.9999389648438
     }
 }
 
@@ -8748,8 +8748,8 @@
     "m_ObjectId": "bb7563f2988546f0840e843e033e451b",
     "m_Title": "Sobel Filter",
     "m_Position": {
-        "x": -6204.00048828125,
-        "y": -2246.999755859375
+        "x": -6204.0009765625,
+        "y": -2245.999755859375
     }
 }
 
@@ -9516,7 +9516,7 @@
     "hlslDeclarationOverride": 0,
     "m_Hidden": false,
     "m_Value": {
-        "m_SerializedTexture": "{\"texture\":{\"fileID\":8400000,\"guid\":\"7dc441532f907f44e8dca72088722ca6\",\"type\":2}}",
+        "m_SerializedTexture": "",
         "m_Guid": ""
     },
     "isMainTexture": false,
@@ -9960,8 +9960,8 @@
     "m_ObjectId": "e3c67d9946424322a7dc436ffc275d2c",
     "m_Title": "BlockCount",
     "m_Position": {
-        "x": -3441.0,
-        "y": 569.999755859375
+        "x": -3437.00048828125,
+        "y": 570.0
     }
 }
 
@@ -10170,8 +10170,8 @@
     "m_ObjectId": "e84d04fd58f64ad398f0432a7ee806c3",
     "m_Title": "HalfBlockSize",
     "m_Position": {
-        "x": -3571.999755859375,
-        "y": 1349.0
+        "x": -3572.00048828125,
+        "y": 1349.00048828125
     }
 }
 
@@ -10197,7 +10197,7 @@
     "m_Title": "BlockSize",
     "m_Position": {
         "x": -3577.0,
-        "y": 909.0
+        "y": 909.0001220703125
     }
 }
 
