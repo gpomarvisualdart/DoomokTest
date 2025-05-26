@@ -76,18 +76,21 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
         if (CO_OnKnockback != null) return;
         if (numOfJumpsMidAir < 1) return;
         if (CO_EarlyJumpBoost != null) StopCoroutine(CO_EarlyJumpBoost);
+        animComms.RequestPlayAnimation((int)GenericAnimEnums.IDLE, 1, 0, false, true);
         CO_EarlyJumpBoost = StartCoroutine(EarlyJumpBoost());
-        rb.isKinematic = false;
-        rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
         numOfJumpsMidAir--;
     }
+
+
     Coroutine CO_EarlyJumpBoost;
     IEnumerator EarlyJumpBoost()
     {
         var flt_count = 0f;
         var flt_time = 0.2f;
         rb.isKinematic = false;
+        rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
         rb.AddForce(Vector3.up * 7.5f, ForceMode.VelocityChange);
+        AttackEnds();
 
        while (flt_count < flt_time)
         {
@@ -193,6 +196,7 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
         currentCombo = 0;
         currentAbillity = null;
         animComms.RequestPlayAnimation((int)GenericAnimEnums.DASH, 1, 0f, true, true);
+        ActivateHitbox(false, 0f, 0f);
 
         var vect3_Direction = transform.position + MoveDir;
 
@@ -203,6 +207,7 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
             rb.velocity += transform.forward * 25f;
             while (flt_Count < flt_Length)
             {
+                if (flt_Count < 0.3f && b_dashEnded) rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
                 if (flt_Count > 0.3f && !b_dashEnded)
                 { currentState = PlayerStates.Idle; rb.velocity = Vector3.zero; b_dashEnded = true; }
                 if (flt_Count > 0.5f) Physics.IgnoreLayerCollision(playerLayer, enemyLayer, false);
@@ -286,10 +291,14 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
     public void DealDamage(float damage, Vector3 dir, float knckBackPwr)
     {
         if (currentState == PlayerStates.Dashing || CO_OnKnockback != null) return;
-        if (healthController.GetCurrentHealth() < 1) return;
+        if (healthController.GetCurrentHealth() < 1 && damage > 0) return;
         KnockEntityBack(dir, knckBackPwr);
         healthController.HealthChange(-damage);
-        if (healthController.GetCurrentHealth() < 1) Debug.Log("Player dead!");
+        if (healthController.GetCurrentHealth() < 1) 
+        { 
+            Debug.Log("Player dead!"); 
+            GameManager.instance.ActivateGameOverScreen();
+        }
     }
 
 
@@ -306,6 +315,7 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
         var flt_Duration = 0.15f;
         rb.isKinematic = false;
         rb.velocity += direction * power;
+        ActivateHitbox(false, 0f, 0f);
 
         while (flt_Count <= flt_Duration)
         {
@@ -314,6 +324,8 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
         }
         if (!rb.isKinematic) rb.velocity = Vector3.zero;
         currentCombo = 0;
+        currentAbillity = null;
+        canCombo = false;
         CO_OnKnockback = null;
     }
 
@@ -338,6 +350,19 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
             if (currentAbillity == null) return;
             currentAbillity.AnimEvents(e.index);
         }
+    }
+
+
+    public void ReloadPlayer()
+    {
+        canCombo = false;
+        numOfJumpsMidAir = 1;
+        if (CO_Dashing != null) { StopCoroutine(CO_Dashing); CO_Dashing = null; }
+        if (CO_EarlyJumpBoost != null) { StopCoroutine(CO_EarlyJumpBoost); CO_EarlyJumpBoost = null; }
+        if (CO_OnKnockback != null) { StopCoroutine(CO_OnKnockback); CO_OnKnockback = null; }
+        DealDamage(-1000f, Vector3.zero, 0f);
+        rb.velocity = Vector3.zero;
+        currentState = PlayerStates.Idle;
     }
 
 

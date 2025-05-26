@@ -18,11 +18,12 @@ public class CheckCollision : MonoBehaviour
         }
     }
 
+
     public bool CollisionChecker()
     {
         //Debug.Log(transform.position + rb.velocity);
-        Vector3 direction = rb.velocity.normalized.normalized;
-        return RotaryHeart.Lib.PhysicsExtension.Physics.CapsuleCast(transform.position + (collid.center / 2f), transform.position + Vector3.up * collid.height/2, collid.radius + 0.01f, direction, rb.velocity.magnitude * Time.fixedDeltaTime, RotaryHeart.Lib.PhysicsExtension.PreviewCondition.Both);
+        Vector3 direction = rb.velocity.normalized;
+        return RotaryHeart.Lib.PhysicsExtension.Physics.CapsuleCast(transform.position + (collid.center / 2f), transform.position + Vector3.up * collid.height, collid.radius + 0.01f, direction, rb.velocity.magnitude * Time.fixedDeltaTime, RotaryHeart.Lib.PhysicsExtension.PreviewCondition.None);
     }
 
 

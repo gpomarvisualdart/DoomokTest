@@ -20,6 +20,7 @@ public class HealthController : MonoBehaviour, IEntityHealthController
         if (currentHealth < 0) currentHealth = 0;
         else if (currentHealth > maxHealth) currentHealth = maxHealth;
 
+        Debug.Log(value);
         UIManager.instance.HealthChanged(currentHealth);
     }
 }

@@ -40,16 +40,17 @@ public class Skill1 : Abillity
                 if (abillityRequests == null) return;
                 var dict_AdditionalInfo = new Dictionary<MovementAdditionalInfo, int>();
                 dict_AdditionalInfo[MovementAdditionalInfo.Layers] = ignoreLayers;
-                abillityRequests.RequestMovement(transform.forward, 15f, 10f, true, dict_AdditionalInfo);
+                abillityRequests.RequestMovement(transform.forward, 30f, 10f, true, dict_AdditionalInfo);
+                lgcBoss.CanLookBeforeAttack(false);
                 break;
             case 1:
                 if (abillityRequests == null) return;
-                abillityRequests.RequestHitbox(true, power, 25f);
+                abillityRequests.RequestHitbox(true, power, 30f);
                 //Debug.Log("Hit box on!");
                 break;
             case 2:
                 if (abillityRequests == null) return;
-                abillityRequests.RequestHitbox(false, power, 25f);
+                abillityRequests.RequestHitbox(false, power, 30f);
                 //Debug.Log("Hit box is off!");
                 break;
             case 3:

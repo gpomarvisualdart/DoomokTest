@@ -15,6 +15,7 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
     IEntityHealthController healthController;
     public Transform GetBossTransform() { return rb.transform; }
     Vector3 MoveDir;
+    bool canLookTowardBeforeAttack = true;
 
 
     [SerializeField] List<Abillity> abillities;
@@ -148,8 +149,18 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
     }
 
 
+    public void CanLookBeforeAttack(bool canLook) { canLookTowardBeforeAttack = canLook; }
+
     private void StartAttack()
     {
+        if (canLookTowardBeforeAttack) 
+        {
+            Vector3 lookDir = transform.position + MoveDir;
+            lookDir.y = transform.position.y;
+            lookDir.z = transform.position.z;
+            transform.LookAt(lookDir);
+        }
+
         if (currentState != BossStates.Attack) return;
         if (currentAbillity != null) return;
         if (abillities.Count < 1) return;
@@ -165,6 +176,7 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
         currentState = BossStates.Calculating;
         lastUsedAbillity = currentAbillity;
         currentAbillity = null;
+        canLookTowardBeforeAttack = true;
         CO_AttackCooldown = StartCoroutine(OnAttackCooldown());
     }
     
@@ -173,7 +185,7 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
     IEnumerator OnAttackCooldown()
     {
         var flt_count = 0f;
-        var flt_MaxTime = 1f;
+        var flt_MaxTime = 0.1f;
         while (flt_count < flt_MaxTime)
         {
             flt_count += Time.deltaTime;
@@ -351,13 +363,13 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
         //Debug.Log(rb.velocity);
         if (onGround)
         {
-            Debug.Log("On ground!");
+            //Debug.Log("On ground!");
             if (!rb.isKinematic && currentState != BossStates.Attack) { rb.isKinematic = true;}
             return true;
         }
         else
         {
-            Debug.Log("Not on ground!");
+            //Debug.Log("Not on ground!");
             rb.isKinematic = false;
 
             return false;

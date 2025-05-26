@@ -37,6 +37,7 @@ public class D_Attack1 : Abillity
             case 1:
                 if (abillityRequests == null) return;
                 abillityRequests.RequestHitbox(true, power, 7.5f);
+                lgcBoss.CanLookBeforeAttack(false);
                 break;
             case 2:
                 if (abillityRequests == null) return;
