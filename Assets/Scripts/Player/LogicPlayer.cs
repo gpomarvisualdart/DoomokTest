@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using ParticleData;
 
 public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGenericAbillityRequests
 {
@@ -292,6 +293,8 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
     {
         if (currentState == PlayerStates.Dashing || CO_OnKnockback != null) return;
         if (healthController.GetCurrentHealth() < 1 && damage > 0) return;
+        ParticleRequestParams parameter = new ParticleRequestParams(ParticleTypes.BLOODHIT, transform.position + transform.up * 0.7f, Vector3.zero, Vector3.one, transform, true);
+        ParticlesVFXManager.instance.RequestParticleVFX(parameter);
         KnockEntityBack(dir, knckBackPwr);
         healthController.HealthChange(-damage);
         if (healthController.GetCurrentHealth() < 1) 
@@ -314,7 +317,7 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
         var flt_Count = 0f;
         var flt_Duration = 0.15f;
         rb.isKinematic = false;
-        rb.velocity += direction * power;
+        rb.velocity += new Vector3(direction.x, 0f, 0f) * power;
         ActivateHitbox(false, 0f, 0f);
 
         while (flt_Count <= flt_Duration)
@@ -377,4 +380,11 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
         GroundControl();
         AirControl();
     }
+
+
+    /*List of elements that should be adjusted so that it will be similar to Hollow Knight:
+    1. Responsive physics, such as quick jump and fall velocity
+    2. Clear Boss telegraph attack, the player should register clearly what attack is coming and 
+    3. Clear visual feedback elements, adding visual effects and animations so it can help the player recognize what is going on
+    */
 }

@@ -37,6 +37,8 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
 
     float minAtkDist = 5.5f;
 
+    bool canAttackFromFar = true;
+
 
     [SerializeField] Transform hitboxTransform;
     IHitboxController hitBox;
@@ -82,7 +84,8 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
         lookDir.z = transform.position.z;
         transform.LookAt(lookDir);
 
-        if (flt_distance < 5f) { currentState = BossStates.Calculating; return; }
+        if (flt_distance >= 7.7f && canAttackFromFar) { currentState = BossStates.Attack; return; }
+        if (flt_distance <= minAtkDist) { currentState = BossStates.Calculating; return; }
         rb.MovePosition(rb.position + MoveDir.normalized * 3 * Time.fixedDeltaTime);
         MovementAnimation(MoveDir);
     }
@@ -104,7 +107,8 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
         backwardTimeCount += Time.fixedDeltaTime;
         
         var flt_distance = Vector3.Distance(plr.transform.position, transform.position);
-        if (flt_distance > 7f) { currentState = BossStates.WalkForwardTracking; backwardTimeCount = 0f; return; }
+        if (flt_distance >= 7.7f && canAttackFromFar) { currentState = BossStates.Attack; return; }    
+        if (flt_distance >= 7f) { currentState = BossStates.WalkForwardTracking; backwardTimeCount = 0f; return; }
 
         Vector3 lookDir = transform.position + MoveDir;
         lookDir.y = transform.position.y;
@@ -132,7 +136,7 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
             if (currentState == BossStates.Attack || CO_AttackCooldown != null) return;
             if (plr == null) return;
             var v3_dist = Vector3.Distance(plr.GetPlayerTransform().position, transform.position);
-            if (v3_dist > minAtkDist) { currentState = BossStates.WalkForwardTracking; return;}
+            //if (v3_dist > minAtkDist) { currentState = BossStates.WalkForwardTracking; return;}
             currentState = BossStates.Attack;
             
         }
@@ -153,6 +157,8 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
 
     private void StartAttack()
     {
+        if (plr == null) { currentState = BossStates.Calculating; return; }
+        var flt_distance = Vector3.Distance(plr.GetPlayerTransform().position, transform.position);
         if (canLookTowardBeforeAttack) 
         {
             Vector3 lookDir = transform.position + MoveDir;
@@ -166,7 +172,10 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
         if (abillities.Count < 1) return;
         var int_RandomAttack = Random.Range(0, abillities.Count);
         if (lastUsedAbillity == abillities[int_RandomAttack]) return;
+        if (int_RandomAttack == 0 && flt_distance > 7.7f) return;
+        if (int_RandomAttack != 0 && !canAttackFromFar) { currentState = BossStates.WalkForwardTracking; return; }
         currentAbillity = abillities[int_RandomAttack];
+        if (int_RandomAttack == 0) canAttackFromFar = true;
         currentAbillity.Execute();        
     }
 
@@ -178,6 +187,8 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
         currentAbillity = null;
         canLookTowardBeforeAttack = true;
         CO_AttackCooldown = StartCoroutine(OnAttackCooldown());
+        var flt_disableFarAttackChance = Random.Range(0f, 1f);
+        if (flt_disableFarAttackChance < 0.4f && abillities[0] != lastUsedAbillity) canAttackFromFar = false;
     }
     
 
@@ -185,7 +196,7 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
     IEnumerator OnAttackCooldown()
     {
         var flt_count = 0f;
-        var flt_MaxTime = 0.1f;
+        var flt_MaxTime = 0.35f;
         while (flt_count < flt_MaxTime)
         {
             flt_count += Time.deltaTime;
@@ -238,6 +249,7 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
         }
         CO_OnDynamicMovement = null;
     }
+
 
     Coroutine CO_OnJump;
     public void RequestJump(Vector3 position, Dictionary<JumpAdditionalInfo, int> additionalData, float duration)

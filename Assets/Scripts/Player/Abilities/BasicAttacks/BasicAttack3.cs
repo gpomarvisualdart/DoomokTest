@@ -1,3 +1,4 @@
+using ParticleData;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -37,6 +38,8 @@ public class BasicAttack3 : Abillity
                 break;
             case 2:
                 abillityRequests.RequestStopMovement();
+                ParticleRequestParams partParams = new ParticleRequestParams(ParticleTypes.SLASH, lgcPlr.GetPlayerTransform().position, new Vector3(0f, 0f, -90f), Vector3.one, lgcPlr.GetPlayerTransform(), true);
+                ParticlesVFXManager.instance.RequestParticleVFX(partParams);
                 break;
             case 3:
                 if (lgcPlr == null) return;
