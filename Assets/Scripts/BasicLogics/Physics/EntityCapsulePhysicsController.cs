@@ -15,6 +15,7 @@ public class EntityCapsulePhysicsController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        GroundCheck();
         ApplyVelocity();
         ApplyGravity();
     }
@@ -23,7 +24,43 @@ public class EntityCapsulePhysicsController : MonoBehaviour
     private void ApplyVelocity()
     {
         currentVelocity = Vector3.ClampMagnitude(currentVelocity, maxSpeed);
-        if (IsColliding()) return;
+        bool collided;
+        /*if (currentVelocity.y != 0f)
+        {
+            collided = RotaryHeart.Lib.PhysicsExtension.Physics.CapsuleCast(transform.position + pointOne, transform.position + pointTwo, radius, Vector3.down, currentVelocity.magnitude * Time.fixedDeltaTime, RotaryHeart.Lib.PhysicsExtension.PreviewCondition.Both);
+            Debug.Log(collided);
+            ApplyGravity(collided);
+        }
+        else if (currentVelocity.y == 0f)
+        {
+            collided = RotaryHeart.Lib.PhysicsExtension.Physics.CapsuleCast(transform.position + pointOne, transform.position + pointTwo, radius, Vector3.down, 0.01f, RotaryHeart.Lib.PhysicsExtension.PreviewCondition.Both);
+            Debug.Log(collided);
+            ApplyGravity(collided);
+        }*/
+
+        Vector3 fixedVelocity = currentVelocity;
+
+        collided = RotaryHeart.Lib.PhysicsExtension.Physics.CapsuleCast(transform.position + pointOne, transform.position + pointTwo, radius, currentVelocity, currentVelocity.magnitude * Time.fixedDeltaTime, RotaryHeart.Lib.PhysicsExtension.PreviewCondition.Both);
+
+        if (collided)
+        {
+            //bool collisionReChecks;
+            if (currentVelocity.x != 0)
+            {
+                Vector3 xDir = new Vector3(currentVelocity.x, 0f, 0f);
+                collided = RotaryHeart.Lib.PhysicsExtension.Physics.CapsuleCast(transform.position + pointOne, transform.position + pointTwo, radius, xDir, currentVelocity.magnitude * Time.fixedDeltaTime, RotaryHeart.Lib.PhysicsExtension.PreviewCondition.Both);
+                if (collided) currentVelocity.x = 0f;
+
+            }
+            if (currentVelocity.y != 0)
+            {
+                Vector3 yDir = new Vector3(0f, currentVelocity.y, 0f);
+                collided = RotaryHeart.Lib.PhysicsExtension.Physics.CapsuleCast(transform.position + pointOne, transform.position + pointTwo, radius, yDir, currentVelocity.magnitude * Time.fixedDeltaTime, RotaryHeart.Lib.PhysicsExtension.PreviewCondition.Both);
+                if (collided && currentVelocity.y < 0f) { currentVelocity.y = 0f; legOnGround = true; currentGravity = defaultGravity; }
+                else currentVelocity.y = 0f;
+            }
+        }
+
         transform.position += currentVelocity * Time.fixedDeltaTime; 
     }
 
@@ -34,32 +71,24 @@ public class EntityCapsulePhysicsController : MonoBehaviour
     }
 
 
-    private bool GroundCheck()
+    bool legOnGround;
+    private void GroundCheck()
     {
-        if (currentVelocity.y == 0f)
-        {
-            return RotaryHeart.Lib.PhysicsExtension.Physics.CapsuleCast(transform.position + pointOne, transform.position + pointTwo, radius, Vector3.down, 0.01f, RotaryHeart.Lib.PhysicsExtension.PreviewCondition.Both);
-        }
-        else
-        {
-            return RotaryHeart.Lib.PhysicsExtension.Physics.CapsuleCast(transform.position + pointOne, transform.position + pointTwo, radius, Vector3.down, currentVelocity.magnitude * Time.fixedDeltaTime, RotaryHeart.Lib.PhysicsExtension.PreviewCondition.Both);
-        }
+        if (!legOnGround) return;
+
+        currentVelocity.y = 0f;
+        bool onGround = RotaryHeart.Lib.PhysicsExtension.Physics.CapsuleCast(transform.position + pointOne, transform.position + pointTwo, radius, Vector3.down, 0.01f, RotaryHeart.Lib.PhysicsExtension.PreviewCondition.Both);
+
+        if (!onGround) legOnGround = false;
+        
     }
 
 
     private void ApplyGravity()
     {
-        Debug.Log(GroundCheck());
-        if(!GroundCheck() )
+        if (!legOnGround)
         {
             currentVelocity.y += currentGravity * Time.fixedDeltaTime;
         }
-        else
-        {
-            currentVelocity.y = 0f;
-            currentGravity = defaultGravity;
-        }
     }
-
-    //Tapi bisa gak kita hanya pakai satu function untuk check collision ditambah ground check? Jadi hanya menggunakan satu capsulecast doang. Soalnya kalau misalkan kita pakai dua function untuk detect ground dan collision, ini akan bermasalah. Contoh misalkan kita lompat, karena ada dua function yang cek ground dan collision dan mereka menggunakan rumus maxDistance yang sama yaitu currentVelocity.magnitude * Time.fixedDeltaTime
 }
