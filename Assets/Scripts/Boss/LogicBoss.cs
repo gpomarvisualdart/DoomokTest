@@ -174,7 +174,7 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
         else if (randomChance >= currentWalkBckChance)
         {
             if (currentState == BossStates.WalkBackwardTracking) return;
-            backwardTimeMax = Random.Range(0.5f, 0.75f);
+            backwardTimeMax = Random.Range(0.2f, 0.4f);
             currentState = BossStates.WalkBackwardTracking;
         }
     }

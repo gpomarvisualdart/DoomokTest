@@ -96,7 +96,7 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
 
     private void AttackEventReceiver(object sender, System.EventArgs e)
     {
-        if (currentState == PlayerStates.Dashing || CO_Dashing != null || CO_OnKnockback != null) return;
+        if (CO_Dashing != null || CO_OnKnockback != null) return;
         if (basicAttacks.Count < 1) return;
         if (currentAbillity != null && canCombo == false) return;
         entPhys.collisionLayers = entPhys.defaultcollisionLayers;
@@ -179,24 +179,24 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
         Physics.IgnoreLayerCollision(playerLayer, enemyLayer, true);
         
         var flt_Count = 0f;
-        var flt_Length = 0.45f;
+        var flt_Length = 0.5f;
         var b_dashEnded = false;
 
-        animComms.RequestPlayAnimation((int)GenericAnimEnums.DASH, 1, 0f, true, true);
+        animComms.RequestPlayAnimation((int)GenericAnimEnums.DASH, 1, 0f, false, true);
         entPhys.collisionLayers = ~LayerMask.GetMask("Enemies", "Hurtbox");
 
         if (MoveDir.x > 0 || MoveDir.x < 0)
         {
             while (flt_Count < flt_Length)
             {
-                if (flt_Count < 0.225f && !b_dashEnded)
+                if (flt_Count < 0.3f && !b_dashEnded)
                 {
                     Vector3 dir = transform.position + MoveDir;
                     Vector3 lookDir = new Vector3(dir.x, transform.position.y, transform.position.z);
                     transform.LookAt(lookDir);
-                    entPhys.currentVelocity = MoveDir * 30f;
+                    entPhys.currentVelocity = MoveDir * 20f;
                 }
-                if (flt_Count > 0.225f && !b_dashEnded)
+                if (flt_Count >= 0.3f && !b_dashEnded)
                 {
                     b_dashEnded = true;
                     currentState = PlayerStates.Idle;
@@ -206,18 +206,18 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
                 yield return null;
             }
         }
-        else 
+        else if (MoveDir == Vector3.zero)
         { 
             while(flt_Count < flt_Length)
             {
-                if (flt_Count < 0.225f && !b_dashEnded) 
+                if (flt_Count < 0.3f && !b_dashEnded) 
                 { 
                     Vector3 dir = transform.position + entPhys.currentVelocity;
                     Vector3 lookDir = new Vector3(dir.x, transform.position.y, transform.position.z);
                     transform.LookAt(lookDir);
-                    entPhys.currentVelocity = transform.forward * 30f;
+                    entPhys.currentVelocity = transform.forward * 20f;
                 }
-                if (flt_Count > 0.225f && !b_dashEnded)
+                if (flt_Count >= 0.3f && !b_dashEnded)
                 {
                     b_dashEnded = true;
                     currentState = PlayerStates.Idle;
@@ -230,6 +230,7 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
         }
         entPhys.collisionLayers = entPhys.defaultcollisionLayers;
         CO_Dashing = null;
+        AttackEnds();
     }
 
 
