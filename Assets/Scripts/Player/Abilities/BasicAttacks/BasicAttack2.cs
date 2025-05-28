@@ -35,7 +35,7 @@ public class BasicAttack2 : Abillity
             case 1:
                 if (lgcPlr == null) return;
                 lgcPlr.ActivateHitbox(true, power, 0f);
-                ParticleRequestParams partParams = new ParticleRequestParams(ParticleTypes.SLASH, lgcPlr.GetPlayerTransform().position, new Vector3(0f, 0f, 50f), Vector3.one, lgcPlr.GetPlayerTransform(), true);
+                ParticleRequestParams partParams = new ParticleRequestParams(ParticleTypes.SLASH, lgcPlr.GetPlayerTransform().position, new Vector3(0f, 0f, 60f), Vector3.one, lgcPlr.GetPlayerTransform(), true);
                 ParticlesVFXManager.instance.RequestParticleVFX(partParams);
                 break;
             case 2:

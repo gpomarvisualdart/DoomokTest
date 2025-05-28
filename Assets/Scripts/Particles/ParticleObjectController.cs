@@ -6,6 +6,7 @@ public class ParticleObjectController : MonoBehaviour
 {
     ParticleHolder holder;
     ParticleSystem ps;
+    float lifeTime;
 
     private void OnEnable()
     {
@@ -18,14 +19,17 @@ public class ParticleObjectController : MonoBehaviour
     public void PlayParticles()
     {
         if (CO_ParticleIsPlaying != null) return;
+        lifeTime = ps.main.duration + ps.main.startLifetime.constantMax;
         ps.Play();
         CO_ParticleIsPlaying = StartCoroutine(ParticleIsPlaying());
     }
 
     IEnumerator ParticleIsPlaying()
     {
-        while (ps.isPlaying)
+        float count = 0f;
+        while ( count <= lifeTime)
         {
+            count += Time.deltaTime;
             yield return null;
         }
         CO_ParticleIsPlaying = null;

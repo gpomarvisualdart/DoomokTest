@@ -1,3 +1,4 @@
+using ParticleData;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -37,6 +38,8 @@ public class D_Attack1 : Abillity
             case 1:
                 if (abillityRequests == null) return;
                 abillityRequests.RequestHitbox(true, power, 7.5f);
+                ParticleRequestParams param = new ParticleRequestParams(ParticleTypes.SLASH, transform.position + transform.up * 1.5f, new Vector3(0,0,-20f), new Vector3(1.5f, 1.5f, 1.5f), transform, true);
+                ParticlesVFXManager.instance.RequestParticleVFX(param);
                 lgcBoss.CanLookBeforeAttack(false);
                 break;
             case 2:

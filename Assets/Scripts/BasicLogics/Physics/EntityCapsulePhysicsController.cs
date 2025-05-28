@@ -12,6 +12,17 @@ public class EntityCapsulePhysicsController : MonoBehaviour
 
     [SerializeField] float defaultGravity = -9.81f;
     public float currentGravity = -9.81f;
+    public LayerMask collisionLayers;
+    [SerializeField] private LayerMask _defaultCollisionLayers;
+    public LayerMask defaultcollisionLayers { get => _defaultCollisionLayers; private set => _defaultCollisionLayers = value; }
+    [SerializeField] RotaryHeart.Lib.PhysicsExtension.PreviewCondition debugType;
+
+
+    private void OnEnable()
+    {
+        collisionLayers = defaultcollisionLayers;
+    }
+
 
     private void FixedUpdate()
     {
@@ -24,40 +35,22 @@ public class EntityCapsulePhysicsController : MonoBehaviour
     private void ApplyVelocity()
     {
         currentVelocity = Vector3.ClampMagnitude(currentVelocity, maxSpeed);
-        bool collided;
-        /*if (currentVelocity.y != 0f)
-        {
-            collided = RotaryHeart.Lib.PhysicsExtension.Physics.CapsuleCast(transform.position + pointOne, transform.position + pointTwo, radius, Vector3.down, currentVelocity.magnitude * Time.fixedDeltaTime, RotaryHeart.Lib.PhysicsExtension.PreviewCondition.Both);
-            Debug.Log(collided);
-            ApplyGravity(collided);
-        }
-        else if (currentVelocity.y == 0f)
-        {
-            collided = RotaryHeart.Lib.PhysicsExtension.Physics.CapsuleCast(transform.position + pointOne, transform.position + pointTwo, radius, Vector3.down, 0.01f, RotaryHeart.Lib.PhysicsExtension.PreviewCondition.Both);
-            Debug.Log(collided);
-            ApplyGravity(collided);
-        }*/
-
-        Vector3 fixedVelocity = currentVelocity;
-
-        collided = RotaryHeart.Lib.PhysicsExtension.Physics.CapsuleCast(transform.position + pointOne, transform.position + pointTwo, radius, currentVelocity, currentVelocity.magnitude * Time.fixedDeltaTime, RotaryHeart.Lib.PhysicsExtension.PreviewCondition.Both);
-
+        RaycastHit hit;
+        bool collided = RotaryHeart.Lib.PhysicsExtension.Physics.CapsuleCast(transform.position + pointOne, transform.position + pointTwo, radius, currentVelocity, out hit, currentVelocity.magnitude * Time.fixedDeltaTime, collisionLayers, debugType);
         if (collided)
         {
-            //bool collisionReChecks;
             if (currentVelocity.x != 0)
             {
                 Vector3 xDir = new Vector3(currentVelocity.x, 0f, 0f);
-                collided = RotaryHeart.Lib.PhysicsExtension.Physics.CapsuleCast(transform.position + pointOne, transform.position + pointTwo, radius, xDir, currentVelocity.magnitude * Time.fixedDeltaTime, RotaryHeart.Lib.PhysicsExtension.PreviewCondition.Both);
-                if (collided) currentVelocity.x = 0f;
+                collided = RotaryHeart.Lib.PhysicsExtension.Physics.CapsuleCast(transform.position + pointOne, transform.position + pointTwo, radius, xDir, out hit, currentVelocity.magnitude * Time.fixedDeltaTime, collisionLayers, debugType);
+                if (collided) { currentVelocity.x = 0f; Debug.Log($"{hit.transform.gameObject.layer} from {hit.transform.name} with {LayerMask.NameToLayer("Enemies")}");}
 
             }
             if (currentVelocity.y != 0)
             {
                 Vector3 yDir = new Vector3(0f, currentVelocity.y, 0f);
-                collided = RotaryHeart.Lib.PhysicsExtension.Physics.CapsuleCast(transform.position + pointOne, transform.position + pointTwo, radius, yDir, currentVelocity.magnitude * Time.fixedDeltaTime, RotaryHeart.Lib.PhysicsExtension.PreviewCondition.Both);
-                if (collided && currentVelocity.y < 0f) { currentVelocity.y = 0f; legOnGround = true; currentGravity = defaultGravity; }
-                else currentVelocity.y = 0f;
+                collided = RotaryHeart.Lib.PhysicsExtension.Physics.CapsuleCast(transform.position + pointOne, transform.position + pointTwo, radius, yDir, out hit, currentVelocity.magnitude * Time.fixedDeltaTime, collisionLayers, debugType);
+                if (collided && Vector3.Dot(hit.normal, Vector3.up) > 0.3f) { currentVelocity.y = 0f; legOnGround = true; currentGravity = defaultGravity;  }
             }
         }
 
@@ -65,19 +58,13 @@ public class EntityCapsulePhysicsController : MonoBehaviour
     }
 
 
-    private bool IsColliding()
-    {
-        return RotaryHeart.Lib.PhysicsExtension.Physics.CapsuleCast(transform.position + pointOne, transform.position + pointTwo, radius, currentVelocity, currentVelocity.magnitude * Time.fixedDeltaTime, RotaryHeart.Lib.PhysicsExtension.PreviewCondition.Both);
-    }
-
 
     bool legOnGround;
     private void GroundCheck()
     {
         if (!legOnGround) return;
 
-        currentVelocity.y = 0f;
-        bool onGround = RotaryHeart.Lib.PhysicsExtension.Physics.CapsuleCast(transform.position + pointOne, transform.position + pointTwo, radius, Vector3.down, 0.01f, RotaryHeart.Lib.PhysicsExtension.PreviewCondition.Both);
+        bool onGround = RotaryHeart.Lib.PhysicsExtension.Physics.CapsuleCast(transform.position + pointOne, transform.position + pointTwo, radius, Vector3.down, 0.01f, collisionLayers, debugType);
 
         if (!onGround) legOnGround = false;
         

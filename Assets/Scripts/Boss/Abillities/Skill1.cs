@@ -40,12 +40,12 @@ public class Skill1 : Abillity
                 if (abillityRequests == null) return;
                 var dict_AdditionalInfo = new Dictionary<MovementAdditionalInfo, int>();
                 dict_AdditionalInfo[MovementAdditionalInfo.Layers] = ignoreLayers;
-                abillityRequests.RequestMovement(transform.forward, 22.5f, 10f, true, dict_AdditionalInfo);
-                lgcBoss.CanLookBeforeAttack(false);
+                abillityRequests.RequestMovement(transform.forward, 30f, 10f, true, dict_AdditionalInfo);
                 break;
             case 1:
                 if (abillityRequests == null) return;
                 abillityRequests.RequestHitbox(true, power, 10f);
+                lgcBoss.CanLookBeforeAttack(false);
                 //Debug.Log("Hit box on!");
                 break;
             case 2:

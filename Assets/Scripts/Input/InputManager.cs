@@ -39,7 +39,7 @@ public class InputManager : MonoBehaviour
     public event EventHandler AttackEventSender;
     private void AttackReceiver(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
-        AttackEventSender.Invoke(this, EventArgs.Empty);
+        AttackEventSender?.Invoke(this, EventArgs.Empty);
     }
 
 

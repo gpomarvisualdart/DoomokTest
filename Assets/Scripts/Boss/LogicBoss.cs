@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEngine;
+using ParticleData;
 using Random = UnityEngine.Random;
 
 public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
@@ -10,6 +11,7 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
     LogicPlayer plr;
     AnimationComms animComms;
     Rigidbody rb;
+    Collider col;
     public BossStates currentState;
     BossStates defaultState;
     IEntityHealthController healthController;
@@ -46,9 +48,12 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
 
     private void OnEnable()
     {
+        WakeDelay();
         rb = GetComponent<Rigidbody>();
+        col = GetComponent<Collider>();
         rb.isKinematic = true;
         rb.velocity = Vector3.zero;
+        currentState = BossStates.Idle;
         healthController = TryGetComponent(out IEntityHealthController ieh) ? ieh : null;
         if (healthController == null) Debug.LogError("No health controller!");
         currentState = BossStates.WalkForwardTracking;
@@ -70,9 +75,28 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
     }
 
 
+    Coroutine CO_DelayBeforeWake;
+    private void WakeDelay()
+    {
+        if (CO_DelayBeforeWake != null) return;
+        CO_DelayBeforeWake = StartCoroutine(DelayBeforeWake());
+    }
+    IEnumerator DelayBeforeWake()
+    {
+        var flt_Count = 0f;
+        var flt_MaxCount = 1f;
+        while (flt_Count <= flt_MaxCount)
+        {
+            flt_Count += Time.deltaTime;
+            yield return null;
+        }
+        CO_DelayBeforeWake = null;
+    }
+
 
     private void TrackTarget()
     {
+        if (CO_DelayBeforeWake != null) return;
         if (plr == null) return;
         MoveDir = (plr.transform.position - transform.position);
         if (currentState != BossStates.WalkForwardTracking) return;
@@ -98,6 +122,7 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
 
     private void TrackTargetBackward()
     {
+        if (CO_DelayBeforeWake != null) return;
         if (plr == null) return;
         MoveDir = (plr.transform.position - transform.position);
 
@@ -128,6 +153,7 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
 
     private void Calculating()
     {
+        if (CO_DelayBeforeWake != null) return;
         if (currentState != BossStates.Calculating) return;
         float randomChance = Random.Range(0f, 1f);
 
@@ -148,6 +174,7 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
         else if (randomChance >= currentWalkBckChance)
         {
             if (currentState == BossStates.WalkBackwardTracking) return;
+            backwardTimeMax = Random.Range(0.5f, 0.75f);
             currentState = BossStates.WalkBackwardTracking;
         }
     }
@@ -157,6 +184,7 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
 
     private void StartAttack()
     {
+        if (CO_DelayBeforeWake != null) return;
         if (plr == null) { currentState = BossStates.Calculating; return; }
         var flt_distance = Vector3.Distance(plr.GetPlayerTransform().position, transform.position);
         if (canLookTowardBeforeAttack) 
@@ -182,6 +210,7 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
 
     public void AttackEnds()
     {
+        if (CO_DelayBeforeWake != null) return;
         currentState = BossStates.Calculating;
         lastUsedAbillity = currentAbillity;
         currentAbillity = null;
@@ -196,7 +225,7 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
     IEnumerator OnAttackCooldown()
     {
         var flt_count = 0f;
-        var flt_MaxTime = 0.35f;
+        var flt_MaxTime = 0.3f;
         while (flt_count < flt_MaxTime)
         {
             flt_count += Time.deltaTime;
@@ -283,19 +312,24 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
     {
         if (healthController == null) return;
         if (healthController.GetCurrentHealth() < 1) return;
+        if (CO_DelayBeforeWake != null) { StopCoroutine(CO_DelayBeforeWake); CO_DelayBeforeWake = null; }
 
         healthController.HealthChange(-damage);
-        //Debug.Log(healthController.GetCurrentHealth());
+
+        ParticleRequestParams param = new ParticleRequestParams(ParticleTypes.BLOODHIT, transform.position + transform.up * 1.5f, Vector3.zero, new Vector3(1.5f, 1.5f, 1.5f), transform, true);
+        ParticlesVFXManager.instance.RequestParticleVFX(param);
 
         if (healthController.GetCurrentHealth() < 1f)
         {
             RequestStopMovement();
+            col.enabled = false;
             currentState = BossStates.Die;
         }
     }
 
     private void StateController()
     {
+        if (CO_DelayBeforeWake != null) return;
         switch (currentState)
         {
             default:
@@ -318,7 +352,6 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
                 break;
 
             case BossStates.WalkBackwardTracking:
-                backwardTimeMax = Random.Range(0.5f, 1f);
                 currentState = BossStates.WalkBackwardTracking;
                 break;
 
@@ -337,6 +370,7 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
 
     private void MovementAnimation(Vector3 direction)
     {
+        if (CO_DelayBeforeWake != null) return;
         if (currentState == BossStates.WalkForwardTracking || currentState == BossStates.WalkBackwardTracking)
         {
             var flt_DotDir = Vector3.Dot(transform.forward, direction);
@@ -349,6 +383,7 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
 
     private void AnimationEndsEventReceiver(object sender, IAnimationEventSender.AnimationEndsEventArgs e)
     {
+        if (CO_DelayBeforeWake != null) return;
         if (e.animType == (int)AnimationEventTypes.AttackEvent)
         {
             AttackEnds();
@@ -358,6 +393,7 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
 
     private void AnimationTriggerEventReceiver(object sender, IAnimationEventSender.AnimationEventTriggerArgs e)
     {
+        if (CO_DelayBeforeWake != null) return;
         if ((AnimationEventTypes)e.animtype == AnimationEventTypes.AttackEvent)
         {
             if (currentAbillity == null) return;
@@ -396,7 +432,6 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
         GroundCheck();
     }
 
-    Vector3 lastPos;
     private void FixedUpdate()
     {
         TrackTarget();

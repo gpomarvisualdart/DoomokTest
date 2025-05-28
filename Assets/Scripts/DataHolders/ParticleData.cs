@@ -32,6 +32,7 @@ public enum ParticleTypes
 {
     SLASH,
     BLOODHIT,
+    EXPLOSION,
 }
 
 
@@ -40,7 +41,7 @@ public static class ParticleIndexes
     public readonly static Dictionary<ParticleTypes, int> chosenParticleType = new Dictionary<ParticleTypes, int>()
     {
         { ParticleTypes.SLASH, 0 },
-        {ParticleTypes.BLOODHIT, 1 },
-
+        { ParticleTypes.BLOODHIT, 1 },
+        { ParticleTypes.EXPLOSION, 2 },
     };
 }

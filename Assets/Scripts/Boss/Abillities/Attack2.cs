@@ -1,3 +1,4 @@
+using ParticleData;
 using ProjectilePoolObject;
 using System.Collections;
 using System.Collections.Generic;
@@ -49,6 +50,8 @@ public class Attack2 : Abillity
                 ProjectileStat projectileStat1 = new ProjectileStat(lgcBoss.GetBossTransform(), -transform.forward, 5f, projectileSpd, power, 10f);
                 ProjectilePoolManager.instance.GetProjectile(projectileStat0, colliderStat, spikes);
                 ProjectilePoolManager.instance.GetProjectile(projectileStat1, colliderStat, spikes);
+                ParticleRequestParams param = new ParticleRequestParams(ParticleTypes.EXPLOSION, lgcBoss.GetBossTransform().position, Vector3.zero, new Vector3(2f, 2f, 2f), lgcBoss.GetBossTransform(), false);
+                ParticlesVFXManager.instance.RequestParticleVFX(param);
                 break;
             case 3:
                 AttackEnds();

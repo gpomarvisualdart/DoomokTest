@@ -11,6 +11,7 @@ public class ParticleHolder : MonoBehaviour
     public void InitializeParticleHolder(ParticleRequestParams prp)
     {
         if (transform.childCount < 1 || transform.childCount > ParticleIndexes.chosenParticleType.Count || transform.childCount < ParticleIndexes.chosenParticleType.Count) { Debug.LogError($"Invalid particle count for {this.name}!!"); return; }
+        
 
         if (prp.isParent) transform.SetParent(prp.parent);
         transform.position = prp.pos;

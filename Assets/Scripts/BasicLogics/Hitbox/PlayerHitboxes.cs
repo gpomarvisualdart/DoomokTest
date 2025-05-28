@@ -37,6 +37,7 @@ public class PlayerHitboxes : MonoBehaviour, IHitboxController
 
     private void OnTriggerEnter(Collider other)
     {
+        Debug.Log("Triggered!");
         if (other.transform.parent.transform == plr.GetPlayerTransform()) return;
         Debug.Log(other.transform.parent.name);
         IDamageDealer dealDamage = other.transform.parent.TryGetComponent(out IDamageDealer dd) ? dd : null;
