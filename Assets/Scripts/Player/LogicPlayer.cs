@@ -80,8 +80,10 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
     {
         if (CO_OnKnockback != null) return;
         if (numOfJumpsMidAir < 1) return;
-        if (CO_Dashing != null && currentState == PlayerStates.Dashing) { currentState = PlayerStates.Idle; StopCoroutine(CO_Dashing); CO_Dashing = null; }
-        
+        if (CO_Dashing != null && currentState == PlayerStates.Dashing) { currentState = PlayerStates.Idle; StopCoroutine(CO_Dashing); CO_Dashing = null; dashEnded = true; }
+        entPhys.dragThreshold = 0f;
+        entPhys.currentDrag = 0f;
+
         AttackEnds();
 
         entPhys.collisionLayers = entPhys.defaultcollisionLayers;
@@ -96,7 +98,7 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
 
     private void AttackEventReceiver(object sender, System.EventArgs e)
     {
-        if (CO_Dashing != null || CO_OnKnockback != null) return;
+        if (!dashEnded || CO_OnKnockback != null) return;
         if (basicAttacks.Count < 1) return;
         if (currentAbillity != null && canCombo == false) return;
         entPhys.collisionLayers = entPhys.defaultcollisionLayers;
@@ -173,55 +175,75 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
         CO_Dashing = StartCoroutine(DashDuration());
     }
 
+    bool dashEnded = true;
     Coroutine CO_Dashing; 
     IEnumerator DashDuration()
     {
-        Physics.IgnoreLayerCollision(playerLayer, enemyLayer, true);
+        entPhys.collisionLayers = ~LayerMask.GetMask("Enemies", "Hurtbox");
+        //Physics.IgnoreLayerCollision(playerLayer, enemyLayer, true);
         
         var flt_Count = 0f;
-        var flt_Length = 0.5f;
-        var b_dashEnded = false;
+        var flt_Length = 0.9f;
+        dashEnded = false;
+
+        entPhys.currentVelocity = Vector3.zero;
 
         animComms.RequestPlayAnimation((int)GenericAnimEnums.DASH, 1, 0f, false, true);
-        entPhys.collisionLayers = ~LayerMask.GetMask("Enemies", "Hurtbox");
 
         if (MoveDir.x > 0 || MoveDir.x < 0)
         {
+            Vector3 dir = transform.position + MoveDir;
+            Vector3 lookDir = new Vector3(dir.x, transform.position.y, transform.position.z);
+            transform.LookAt(lookDir);
+            entPhys.currentVelocity = MoveDir * 15f;
             while (flt_Count < flt_Length)
             {
-                if (flt_Count < 0.3f && !b_dashEnded)
+                if (flt_Count <= 0.63f)
                 {
-                    Vector3 dir = transform.position + MoveDir;
-                    Vector3 lookDir = new Vector3(dir.x, transform.position.y, transform.position.z);
-                    transform.LookAt(lookDir);
-                    entPhys.currentVelocity = MoveDir * 20f;
+                    entPhys.currentVelocity.y = 0f;
                 }
-                if (flt_Count >= 0.3f && !b_dashEnded)
+                if (flt_Count >= 0.27f && !dashEnded)
                 {
-                    b_dashEnded = true;
+                    entPhys.dragThreshold = 0.1f;
+                    entPhys.currentDrag = 5f;
+                }
+                if (flt_Count >= 0.63f && !dashEnded)
+                {
+                    dashEnded = true;
                     currentState = PlayerStates.Idle;
                     entPhys.currentVelocity = Vector3.zero;
+                    entPhys.dragThreshold = 0f;
+                    entPhys.currentDrag = 0f;
                 }
                 flt_Count += Time.deltaTime;
                 yield return null;
             }
         }
         else if (MoveDir == Vector3.zero)
-        { 
-            while(flt_Count < flt_Length)
+        {
+            Vector3 dir = transform.forward;
+            //Vector3 lookDir = new Vector3(dir.x, transform.position.y, transform.position.z);
+            //transform.LookAt(transform.forward);
+            entPhys.currentVelocity = dir.normalized * 15f;
+            while (flt_Count < flt_Length)
             {
-                if (flt_Count < 0.3f && !b_dashEnded) 
-                { 
-                    Vector3 dir = transform.position + entPhys.currentVelocity;
-                    Vector3 lookDir = new Vector3(dir.x, transform.position.y, transform.position.z);
-                    transform.LookAt(lookDir);
-                    entPhys.currentVelocity = transform.forward * 20f;
-                }
-                if (flt_Count >= 0.3f && !b_dashEnded)
+                if (flt_Count <= 0.63f)
                 {
-                    b_dashEnded = true;
+                    entPhys.currentVelocity.y = 0f;
+                }
+                if (flt_Count >= 0.27f && !dashEnded) 
+                {
+                    entPhys.currentVelocity.y = 0f;
+                    entPhys.dragThreshold = 0.1f;
+                    entPhys.currentDrag = 5f;
+                }
+                if (flt_Count >= 0.63f && !dashEnded)
+                {
+                    dashEnded = true;
                     currentState = PlayerStates.Idle;
                     entPhys.currentVelocity = Vector3.zero;
+                    entPhys.dragThreshold = 0f;
+                    entPhys.currentDrag = 0f;
                 }
                 flt_Count += Time.deltaTime;
                 yield return null;
@@ -243,7 +265,7 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
 
         var vect3_lookDir = new Vector3(transform.position.x + MoveDir.x, transform.position.y, transform.position.z);
         transform.LookAt(vect3_lookDir);
-        entPhys.currentVelocity.x = MoveDir.x * 7.5f;
+        entPhys.currentVelocity.x = MoveDir.x * 5f;
         animComms.RequestPlayAnimation((int)GenericAnimEnums.WALKFWD, 1, 0, false, false);
 
     }
@@ -270,7 +292,7 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
 
     public void DealDamage(float damage, Vector3 dir, float knckBackPwr)
     {
-        if (CO_Dashing != null || CO_OnKnockback != null) return;
+        if (CO_Dashing != null && !dashEnded || CO_OnKnockback != null) return;
         if (healthController.GetCurrentHealth() < 1 && damage > 0) return;
         ParticleRequestParams parameter = new ParticleRequestParams(ParticleTypes.BLOODHIT, transform.position + transform.up * 0.7f, Vector3.zero, Vector3.one, transform, true);
         ParticlesVFXManager.instance.RequestParticleVFX(parameter);
@@ -292,6 +314,8 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
             StopCoroutine(CO_Dashing);
             CO_Dashing = null;
             animComms.RequestPlayAnimation((int)GenericAnimEnums.IDLE, 1, 0, false, true);
+            dashEnded = true;
+            entPhys.collisionLayers = ~0;
         }
         AttackEnds();
         animComms.RequestPlayAnimation((int)GenericAnimEnums.IDLE, 1, 0, false, false);

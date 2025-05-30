@@ -33,7 +33,7 @@ public class D_Attack1 : Abillity
             case 0:
                 if (abillityRequests == null) return;
                 var dict_AdditionalInfo = new Dictionary<MovementAdditionalInfo , int>();
-                abillityRequests.RequestMovement(transform.forward, 30f, 0f, false, dict_AdditionalInfo);
+                abillityRequests.RequestMovement(transform.forward, 20f, 0f, false, dict_AdditionalInfo);
                 break;
             case 1:
                 if (abillityRequests == null) return;

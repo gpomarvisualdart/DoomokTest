@@ -38,7 +38,7 @@ public class GenericHitboxes : MonoBehaviour, IHitboxController
     private void OnTriggerEnter(Collider other)
     {
         if (other.transform.parent.transform == boss.GetBossTransform()) return;
-        Debug.Log(other.transform.parent.name);
+        //Debug.Log(other.transform.parent.name);
         IDamageDealer dealDamage = other.transform.parent.TryGetComponent(out IDamageDealer dd) ? dd : null;
         if (dealDamage == null) return;
         var vect3_dir = other.transform.position - boss.GetBossTransform().position;
