@@ -6,7 +6,6 @@ using ParticleData;
 public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGenericAbillityRequests
 {
     InputManager inputManager;
-    Rigidbody rb;
     EntityCapsulePhysicsController entPhys;
     [SerializeField] PlayerStates currentState;
     IEntityHealthController healthController;
@@ -47,11 +46,8 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
 
         canCombo = false;
         maxCombos = basicAttacks.Count < 1 ? 0 : basicAttacks.Count - 1;
-        rb = GetComponent<Rigidbody>();
-        rb.velocity = Vector3.zero;
         entPhys = TryGetComponent(out EntityCapsulePhysicsController epc) ? epc : null;
         //rb.isKinematic = true;
-        airForce = rb.mass * 30f;
         animComms = GetComponentInChildren<AnimationComms>();
         playerLayer = LayerMask.NameToLayer("Player");
         enemyLayer = LayerMask.NameToLayer("Enemies");
@@ -88,11 +84,11 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
 
         entPhys.collisionLayers = entPhys.defaultcollisionLayers;
         currentState = PlayerStates.Idle;
-        animComms.RequestPlayAnimation((int)GenericAnimEnums.IDLE, 1, 0, false, true);
         entPhys.currentGravity = -50f;
         float jumpVel = Mathf.Sqrt(2 * -entPhys.currentGravity * jumpHeight);
         entPhys.currentVelocity.y = jumpVel;
         numOfJumpsMidAir--;
+        animComms.RequestPlayAnimation((int)GenericAnimEnums.JUMP, 1, 0, false, true);
 
     }
 
@@ -104,6 +100,7 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
         entPhys.collisionLayers = entPhys.defaultcollisionLayers;
         currentState = PlayerStates.Attacking;
         currentAbillity = basicAttacks[currentCombo];
+        entPhys.currentVelocity = Vector3.zero;
         currentAbillity.Execute();
     }
 
@@ -179,7 +176,7 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
     Coroutine CO_Dashing; 
     IEnumerator DashDuration()
     {
-        entPhys.collisionLayers = ~LayerMask.GetMask("Enemies", "Hurtbox");
+        entPhys.collisionLayers = ~LayerMask.GetMask("Enemies", "Hurtbox", "Hitbox");
         //Physics.IgnoreLayerCollision(playerLayer, enemyLayer, true);
         
         var flt_Count = 0f;
@@ -195,7 +192,7 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
             Vector3 dir = transform.position + MoveDir;
             Vector3 lookDir = new Vector3(dir.x, transform.position.y, transform.position.z);
             transform.LookAt(lookDir);
-            entPhys.currentVelocity = MoveDir * 15f;
+            entPhys.currentVelocity = new Vector3(MoveDir.x, 0f, MoveDir.z) * 15f;
             while (flt_Count < flt_Length)
             {
                 if (flt_Count <= 0.63f)
@@ -214,6 +211,7 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
                     entPhys.currentVelocity = Vector3.zero;
                     entPhys.dragThreshold = 0f;
                     entPhys.currentDrag = 0f;
+                    entPhys.collisionLayers = entPhys.defaultcollisionLayers;
                 }
                 flt_Count += Time.deltaTime;
                 yield return null;
@@ -222,6 +220,7 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
         else if (MoveDir == Vector3.zero)
         {
             Vector3 dir = transform.forward;
+            dir.y = 0f;
             //Vector3 lookDir = new Vector3(dir.x, transform.position.y, transform.position.z);
             //transform.LookAt(transform.forward);
             entPhys.currentVelocity = dir.normalized * 15f;
@@ -244,13 +243,13 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
                     entPhys.currentVelocity = Vector3.zero;
                     entPhys.dragThreshold = 0f;
                     entPhys.currentDrag = 0f;
+                    entPhys.collisionLayers = entPhys.defaultcollisionLayers;
                 }
                 flt_Count += Time.deltaTime;
                 yield return null;
             }
 
         }
-        entPhys.collisionLayers = entPhys.defaultcollisionLayers;
         CO_Dashing = null;
         AttackEnds();
     }
@@ -266,7 +265,7 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
         var vect3_lookDir = new Vector3(transform.position.x + MoveDir.x, transform.position.y, transform.position.z);
         transform.LookAt(vect3_lookDir);
         entPhys.currentVelocity.x = MoveDir.x * 5f;
-        animComms.RequestPlayAnimation((int)GenericAnimEnums.WALKFWD, 1, 0, false, false);
+        if (GroundCheck()) animComms.RequestPlayAnimation((int)GenericAnimEnums.WALKFWD, 1, 0, false, false);
 
     }
 
@@ -283,7 +282,7 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
         else
         {
             //if (rb.isKinematic) { rb.isKinematic = false; }
-
+            if (dashEnded) animComms.RequestPlayAnimation((int)GenericAnimEnums.FALLING, 1, 0, false, false);
             return false; 
         } 
     }
@@ -327,7 +326,6 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
 
         var flt_Count = 0f;
         var flt_Duration = 0.15f;
-        rb.isKinematic = false;
         entPhys.currentVelocity = new Vector3(direction.x, 0f, 0f) * power;
         ActivateHitbox(false, 0f, 0f);
 
@@ -370,7 +368,7 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
         if (CO_Dashing != null) { StopCoroutine(CO_Dashing); CO_Dashing = null; }
         if (CO_OnKnockback != null) { StopCoroutine(CO_OnKnockback); CO_OnKnockback = null; }
         DealDamage(-1000f, Vector3.zero, 0f);
-        rb.velocity = Vector3.zero;
+        entPhys.currentVelocity = Vector3.zero;
         currentState = PlayerStates.Idle;
     }
 

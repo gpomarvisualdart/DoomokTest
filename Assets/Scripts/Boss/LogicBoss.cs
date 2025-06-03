@@ -10,12 +10,12 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
 {
     LogicPlayer plr;
     AnimationComms animComms;
-    Rigidbody rb;
     Collider col;
+    EntityCapsulePhysicsController entPhys;
     public BossStates currentState;
     BossStates defaultState;
     IEntityHealthController healthController;
-    public Transform GetBossTransform() { return rb.transform; }
+    public Transform GetBossTransform() { return transform; }
     Vector3 MoveDir;
     bool canLookTowardBeforeAttack = true;
 
@@ -49,10 +49,8 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
     private void OnEnable()
     {
         WakeDelay();
-        rb = GetComponent<Rigidbody>();
         col = GetComponent<Collider>();
-        rb.isKinematic = true;
-        rb.velocity = Vector3.zero;
+        entPhys = GetComponent<EntityCapsulePhysicsController>();
         currentState = BossStates.Idle;
         healthController = TryGetComponent(out IEntityHealthController ieh) ? ieh : null;
         if (healthController == null) Debug.LogError("No health controller!");
@@ -98,7 +96,7 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
     {
         if (CO_DelayBeforeWake != null) return;
         if (plr == null) return;
-        MoveDir = (plr.transform.position - transform.position);
+        MoveDir = new Vector3(plr.GetPlayerTransform().position.x, 0f, plr.GetPlayerTransform().position.z) - new Vector3(transform.position.x, 0f, transform.position.z);
         if (currentState != BossStates.WalkForwardTracking) return;
         if (!GroundCheck()) return;
 
@@ -108,9 +106,9 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
         lookDir.z = transform.position.z;
         transform.LookAt(lookDir);
 
-        if (flt_distance >= 7.7f && canAttackFromFar) { currentState = BossStates.Attack; return; }
-        if (flt_distance <= minAtkDist) { currentState = BossStates.Calculating; return; }
-        rb.MovePosition(rb.position + MoveDir.normalized * 3 * Time.fixedDeltaTime);
+        if (flt_distance >= 7.7f && canAttackFromFar) { entPhys.currentVelocity = Vector3.zero; currentState = BossStates.Attack; return; }
+        if (flt_distance <= minAtkDist) { entPhys.currentVelocity = Vector3.zero; currentState = BossStates.Calculating; return; }
+        entPhys.currentVelocity = MoveDir.normalized * 3;
         MovementAnimation(MoveDir);
     }
 
@@ -118,22 +116,19 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
 
     float backwardTimeCount = 0f;
     float backwardTimeMax;
-
-
     private void TrackTargetBackward()
     {
         if (CO_DelayBeforeWake != null) return;
         if (plr == null) return;
-        MoveDir = (plr.transform.position - transform.position);
-
+        MoveDir = new Vector3(plr.GetPlayerTransform().position.x, 0f, plr.GetPlayerTransform().position.z) - new Vector3(transform.position.x, 0f, transform.position.z);
         if (currentState != BossStates.WalkBackwardTracking) return;
         if (!GroundCheck()) return;
 
         backwardTimeCount += Time.fixedDeltaTime;
         
         var flt_distance = Vector3.Distance(plr.transform.position, transform.position);
-        if (flt_distance >= 7.7f && canAttackFromFar) { currentState = BossStates.Attack; return; }    
-        if (flt_distance >= 7f) { currentState = BossStates.WalkForwardTracking; backwardTimeCount = 0f; return; }
+        if (flt_distance >= 7.7f && canAttackFromFar) { entPhys.currentVelocity = Vector3.zero; currentState = BossStates.Attack; return; }    
+        if (flt_distance >= 7f) { entPhys.currentVelocity = Vector3.zero; currentState = BossStates.WalkForwardTracking; backwardTimeCount = 0f; return; }
 
         Vector3 lookDir = transform.position + MoveDir;
         lookDir.y = transform.position.y;
@@ -143,10 +138,11 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
         if (backwardTimeCount > backwardTimeMax) 
         { 
             currentState = BossStates.Calculating; 
-            backwardTimeCount = 0f;  
+            backwardTimeCount = 0f;
+            entPhys.currentVelocity = Vector3.zero;
             return; 
         }
-        rb.MovePosition(rb.position - MoveDir.normalized * 2 * Time.fixedDeltaTime);
+        entPhys.currentVelocity = -MoveDir.normalized * 2;
         MovementAnimation(-MoveDir);
     }
 
@@ -248,32 +244,33 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
     }
     private void StaticMovement(Vector3 dir, float spd, Dictionary<MovementAdditionalInfo, int> addInfo)
     {
-        rb.isKinematic = false;
-        Physics.IgnoreLayerCollision(enemyLayer, playerLayer, true);
-        rb.velocity += dir * spd;
+        dir.y = 0f;
+        entPhys.currentVelocity = dir * spd;
+        entPhys.collisionLayers = ~LayerMask.GetMask("Player", "Hurtbox", "Hitbox");
     }
     Coroutine CO_OnDynamicMovement;
     private void DynamicMovement(Vector3 dir, float spd, float duration, Dictionary<MovementAdditionalInfo, int> addInfo)
     {
         if (CO_OnDynamicMovement != null) return;
-        Physics.IgnoreLayerCollision(enemyLayer, playerLayer, true);
-        rb.isKinematic = false;
         CO_OnDynamicMovement = StartCoroutine(OnDynamicMovement(dir, spd, duration, addInfo));
+        entPhys.collisionLayers = ~LayerMask.GetMask("Player", "Hurtbox", "Hitbox");
 
     }
     IEnumerator OnDynamicMovement(Vector3 dir, float spd, float duration, Dictionary<MovementAdditionalInfo, int> addInfo)
     {
         var flt_Count = 0f;
+        dir.y = 0f;
         var vect3_thisDir = dir;
         int mask = ~addInfo[MovementAdditionalInfo.Layers];
 
         while (flt_Count <= duration)
         {
-            var b_FrontNotClear = Physics.Raycast(transform.position, vect3_thisDir, spd * Time.fixedDeltaTime * 5f, mask);
+            var b_FrontNotClear = Physics.Raycast(transform.position, vect3_thisDir, spd * Time.fixedDeltaTime * 4f, mask);
             if (b_FrontNotClear) { vect3_thisDir = -vect3_thisDir; }
             transform.LookAt(new Vector3(transform.position.x + vect3_thisDir.x, transform.position.y, transform.position.z));
-            rb.velocity = vect3_thisDir * spd;
+            entPhys.currentVelocity = vect3_thisDir * spd;
             flt_Count += Time.fixedDeltaTime;
+            Debug.Log(vect3_thisDir);
             yield return new WaitForFixedUpdate();
         }
         CO_OnDynamicMovement = null;
@@ -300,11 +297,10 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
 
     public void RequestStopMovement()
     {
-        if (CO_OnDynamicMovement != null) { rb.velocity = Vector3.zero; rb.position = transform.position; StopCoroutine(CO_OnDynamicMovement); CO_OnDynamicMovement = null; }
-        rb.velocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
-        rb.isKinematic = true;
-        Physics.IgnoreLayerCollision(enemyLayer, playerLayer, false);
+        if (CO_OnDynamicMovement != null) {  StopCoroutine(CO_OnDynamicMovement); CO_OnDynamicMovement = null; }
+
+        entPhys.collisionLayers = entPhys.defaultcollisionLayers;
+        entPhys.currentVelocity = Vector3.zero;
     }
 
 
@@ -338,7 +334,8 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
                 break;
 
             case BossStates.Idle:
-                rb.velocity = Vector3.zero; break;
+                 
+                break;
 
             case BossStates.Calculating:
                 Calculating(); break;
@@ -408,17 +405,13 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
         Vector3 rayOrigin = transform.position + transform.up * (1.5f / 2);
         Vector3 rayDirection = Vector3.down * (1.5f / 2);
         Debug.DrawRay(rayOrigin, rayDirection, Color.red);
-        //Debug.Log(rb.velocity);
         if (onGround)
         {
-            //Debug.Log("On ground!");
-            if (!rb.isKinematic && currentState != BossStates.Attack) { rb.isKinematic = true;}
+
             return true;
         }
         else
         {
-            //Debug.Log("Not on ground!");
-            rb.isKinematic = false;
 
             return false;
         }

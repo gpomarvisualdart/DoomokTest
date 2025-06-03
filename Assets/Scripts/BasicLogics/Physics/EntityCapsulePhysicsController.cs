@@ -7,6 +7,7 @@ public class EntityCapsulePhysicsController : MonoBehaviour
     public Vector3 currentVelocity;
     [SerializeField] Vector3 pointOne;
     [SerializeField] Vector3 pointTwo;
+    [SerializeField] float distGroundCheck;
     [SerializeField] float radius;
     [SerializeField] float maxSpeed = 50f;
 
@@ -47,7 +48,7 @@ public class EntityCapsulePhysicsController : MonoBehaviour
             {
                 Vector3 xDir = new Vector3(currentVelocity.x, 0f, 0f);
                 collided = RotaryHeart.Lib.PhysicsExtension.Physics.CapsuleCast(transform.position + pointOne, transform.position + pointTwo, radius, xDir, out hit, currentVelocity.magnitude * Time.fixedDeltaTime, collisionLayers, debugType);
-                if (collided) { currentVelocity.x = 0f; Debug.Log($"{hit.transform.gameObject.layer} from {hit.transform.name} with {LayerMask.NameToLayer("Enemies")} and current layer value is {collisionLayers.value}");}
+                if (collided) { currentVelocity.x = 0f; /*Debug.Log($"{hit.transform.gameObject.layer} from {hit.transform.name} with {LayerMask.NameToLayer("Enemies")} and current layer value is {collisionLayers.value} executed by {this.gameObject.name}");*/}
 
             }
             if (currentVelocity.y != 0)
@@ -77,7 +78,9 @@ public class EntityCapsulePhysicsController : MonoBehaviour
     {
         if (!legOnGround) return;
 
-        bool onGround = RotaryHeart.Lib.PhysicsExtension.Physics.CapsuleCast(transform.position + pointOne, transform.position + pointTwo, radius, Vector3.down, 0.01f, collisionLayers, debugType);
+        bool onGround = RotaryHeart.Lib.PhysicsExtension.Physics.CapsuleCast(transform.position + pointOne, transform.position + pointTwo, radius, Vector3.down, distGroundCheck, collisionLayers, debugType);
+
+        if (this.gameObject.transform.TryGetComponent(out LogicBoss boss)) { Debug.Log("Boss OnGround!"); }
 
         if (!onGround) legOnGround = false;
         
@@ -89,6 +92,7 @@ public class EntityCapsulePhysicsController : MonoBehaviour
         if (!legOnGround)
         {
             currentVelocity.y += currentGravity * Time.fixedDeltaTime;
+            if (this.gameObject.transform.TryGetComponent(out LogicBoss boss)) { Debug.Log("Boss Gravity!"); }
         }
     }
 }

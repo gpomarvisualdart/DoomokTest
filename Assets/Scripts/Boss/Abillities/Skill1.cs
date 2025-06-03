@@ -40,7 +40,7 @@ public class Skill1 : Abillity
                 if (abillityRequests == null) return;
                 var dict_AdditionalInfo = new Dictionary<MovementAdditionalInfo, int>();
                 dict_AdditionalInfo[MovementAdditionalInfo.Layers] = ignoreLayers;
-                abillityRequests.RequestMovement(transform.forward, 15f, 10f, true, dict_AdditionalInfo);
+                abillityRequests.RequestMovement(lgcBoss.GetBossTransform().forward, 15f, 10f, true, dict_AdditionalInfo);
                 break;
             case 1:
                 if (abillityRequests == null) return;

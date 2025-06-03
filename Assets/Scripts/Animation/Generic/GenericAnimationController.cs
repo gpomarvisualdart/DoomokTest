@@ -74,7 +74,7 @@ public class GenericAnimationController : MonoBehaviour, IAnimationController
         bool canBypass;
 
         var splitParse = dataParse.Split(":");
-        if (splitParse.Length < 5 || splitParse.Length > 5) { Debug.LogError($"Data parse length is not valid! It needs to be 4 and not {splitParse.Length}!"); return; }
+        if (splitParse.Length < 5 || splitParse.Length > 5) { Debug.LogError($"Data parse length is not valid! It needs to be 4 and not {splitParse.Length}! From parse {dataParse}!"); return; }
 
         if (!int.TryParse(splitParse[0], out animIndex)) return;
         if (!int.TryParse(splitParse[1], out animHashArray)) return;

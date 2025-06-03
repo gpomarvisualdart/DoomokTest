@@ -36,8 +36,8 @@ public class Attack2 : Abillity
                 lgcBoss.CanLookBeforeAttack(false);
                 var int_randomDir = Random.Range(0, 2);
                 var flt_randomRange = Random.Range(1f, 5f);
-                if (int_randomDir == 0) abillityRequests.RequestMovement(transform.forward * flt_randomRange, 5f, 5f, false, null);
-                else abillityRequests.RequestMovement(transform.forward * (-flt_randomRange), 5f, 5f, false, null);
+                if (int_randomDir == 0) abillityRequests.RequestMovement(lgcBoss.GetBossTransform().forward * flt_randomRange, 5f, 5f, false, null);
+                else abillityRequests.RequestMovement(lgcBoss.GetBossTransform().forward * (-flt_randomRange), 5f, 5f, false, null);
                 //Debug.Log(int_randomDir);
                 break;
             case 1:
@@ -45,7 +45,7 @@ public class Attack2 : Abillity
                 break;
             case 2:
                 int collideLayer = LayerMask.GetMask("Hurtbox");
-                ProjectileCapsuleColliderStat colliderStat = new ProjectileCapsuleColliderStat(new Vector3(0f, 0.6f, 0f), 0.7f, 1f, true, collideLayer);
+                ProjectileCapsuleColliderStat colliderStat = new ProjectileCapsuleColliderStat(new Vector3(0f, 2.0f, 0f), 2.0f, 1f, true, collideLayer);
                 ProjectileStat projectileStat0 = new ProjectileStat(lgcBoss.GetBossTransform(), transform.forward, 5f, projectileSpd, power, 10f);
                 ProjectileStat projectileStat1 = new ProjectileStat(lgcBoss.GetBossTransform(), -transform.forward, 5f, projectileSpd, power, 10f);
                 ProjectilePoolManager.instance.GetProjectile(projectileStat0, colliderStat, spikes);
