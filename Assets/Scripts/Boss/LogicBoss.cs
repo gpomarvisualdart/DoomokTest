@@ -96,7 +96,8 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
     {
         if (CO_DelayBeforeWake != null) return;
         if (plr == null) return;
-        MoveDir = new Vector3(plr.GetPlayerTransform().position.x, 0f, plr.GetPlayerTransform().position.z) - new Vector3(transform.position.x, 0f, transform.position.z);
+        MoveDir = new Vector3(plr.GetPlayerTransform().position.x, 0f, 0f) - new Vector3(transform.position.x, 0f, 0f);
+        MoveDir.y = 0f;
         if (currentState != BossStates.WalkForwardTracking) return;
         if (!GroundCheck()) return;
 
@@ -107,7 +108,7 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
         transform.LookAt(lookDir);
 
         if (flt_distance >= 7.7f && canAttackFromFar) { entPhys.currentVelocity = Vector3.zero; currentState = BossStates.Attack; return; }
-        if (flt_distance <= minAtkDist) { entPhys.currentVelocity = Vector3.zero; currentState = BossStates.Calculating; return; }
+        if (flt_distance <= minAtkDist) { entPhys.currentVelocity = new Vector3(0f, entPhys.currentVelocity.y, 0f); currentState = BossStates.Calculating; return; }
         entPhys.currentVelocity = MoveDir.normalized * 3;
         MovementAnimation(MoveDir);
     }
@@ -120,7 +121,8 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
     {
         if (CO_DelayBeforeWake != null) return;
         if (plr == null) return;
-        MoveDir = new Vector3(plr.GetPlayerTransform().position.x, 0f, plr.GetPlayerTransform().position.z) - new Vector3(transform.position.x, 0f, transform.position.z);
+        MoveDir = new Vector3(plr.GetPlayerTransform().position.x, 0f, 0f) - new Vector3(transform.position.x, 0f, 0f);
+        MoveDir.y = 0f;
         if (currentState != BossStates.WalkBackwardTracking) return;
         if (!GroundCheck()) return;
 
@@ -128,7 +130,7 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
         
         var flt_distance = Vector3.Distance(plr.transform.position, transform.position);
         if (flt_distance >= 7.7f && canAttackFromFar) { entPhys.currentVelocity = Vector3.zero; currentState = BossStates.Attack; return; }    
-        if (flt_distance >= 7f) { entPhys.currentVelocity = Vector3.zero; currentState = BossStates.WalkForwardTracking; backwardTimeCount = 0f; return; }
+        if (flt_distance >= 7f) { entPhys.currentVelocity = new Vector3(0f, entPhys.currentVelocity.y, 0f); currentState = BossStates.WalkForwardTracking; backwardTimeCount = 0f; return; }
 
         Vector3 lookDir = transform.position + MoveDir;
         lookDir.y = transform.position.y;
@@ -151,6 +153,7 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
     {
         if (CO_DelayBeforeWake != null) return;
         if (currentState != BossStates.Calculating) return;
+        entPhys.currentVelocity = new Vector3(0f, entPhys.currentVelocity.y, 0f);
         float randomChance = Random.Range(0f, 1f);
 
         if (randomChance >= currentAttackChance)
@@ -244,7 +247,6 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
     }
     private void StaticMovement(Vector3 dir, float spd, Dictionary<MovementAdditionalInfo, int> addInfo)
     {
-        dir.y = 0f;
         entPhys.currentVelocity = dir * spd;
         entPhys.collisionLayers = ~LayerMask.GetMask("Player", "Hurtbox", "Hitbox");
     }
@@ -259,18 +261,17 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
     IEnumerator OnDynamicMovement(Vector3 dir, float spd, float duration, Dictionary<MovementAdditionalInfo, int> addInfo)
     {
         var flt_Count = 0f;
-        dir.y = 0f;
         var vect3_thisDir = dir;
+        dir.y = 0f;
         int mask = ~addInfo[MovementAdditionalInfo.Layers];
 
         while (flt_Count <= duration)
         {
-            var b_FrontNotClear = Physics.Raycast(transform.position, vect3_thisDir, spd * Time.fixedDeltaTime * 4f, mask);
+            var b_FrontNotClear = RotaryHeart.Lib.PhysicsExtension.Physics.Raycast(transform.position, vect3_thisDir, spd * Time.fixedDeltaTime * 4f, mask, RotaryHeart.Lib.PhysicsExtension.PreviewCondition.None);
             if (b_FrontNotClear) { vect3_thisDir = -vect3_thisDir; }
             transform.LookAt(new Vector3(transform.position.x + vect3_thisDir.x, transform.position.y, transform.position.z));
             entPhys.currentVelocity = vect3_thisDir * spd;
             flt_Count += Time.fixedDeltaTime;
-            Debug.Log(vect3_thisDir);
             yield return new WaitForFixedUpdate();
         }
         CO_OnDynamicMovement = null;
@@ -300,7 +301,7 @@ public class LogicBoss : MonoBehaviour, IGenericAbillityRequests, IDamageDealer
         if (CO_OnDynamicMovement != null) {  StopCoroutine(CO_OnDynamicMovement); CO_OnDynamicMovement = null; }
 
         entPhys.collisionLayers = entPhys.defaultcollisionLayers;
-        entPhys.currentVelocity = Vector3.zero;
+        entPhys.currentVelocity = new Vector3(0f, entPhys.currentVelocity.y, 0f);
     }
 
 

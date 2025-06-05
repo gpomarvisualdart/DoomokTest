@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-8725113247097547489
+--- !u!114 &-2866329581480795743
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}
@@ -20,14 +20,14 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Shader Graphs_BeginnerShader
-  m_Shader: {fileID: -6465566751694194690, guid: 414ee22c110486844abbe491bcda2c9e,
+  m_Name: TestDarkFantasyMat
+  m_Shader: {fileID: -6465566751694194690, guid: 29c603a0b82d65049962008eba1c78e5,
     type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
-  m_LightmapFlags: 4
+  m_LightmapFlags: 2
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
@@ -37,10 +37,6 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
-    - _TutorialTexture:
-        m_Texture: {fileID: 10307, guid: 0000000000000000f000000000000000, type: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -55,8 +51,11 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _HighlightSharpness: 3
     - _QueueControl: 0
     - _QueueOffset: 0
     m_Colors:
-    - _BaseMyColor: {r: 1, g: 0.03301889, b: 0.03301889, a: 0}
+    - _BaseColor: {r: 0.21030743, g: 0.14173195, b: 0.3301887, a: 0}
+    - _HighlightColor: {r: 0.6784314, g: 0.3445888, b: 0.19999999, a: 0}
+    - _UpWorld: {r: 0, g: 1, b: 0, a: 0}
   m_BuildTextureStacks: []

@@ -23,7 +23,7 @@ public class Skill1 : Abillity
             if (lgcBoss == null || animComms == null || abillityRequests == null) {Debug.LogError($"Missing scripts on {this.name}!"); return;}
         }
 
-        ignoreLayers = LayerMask.GetMask("Player", "Enemies", "Hurtbox");
+        ignoreLayers = LayerMask.GetMask("Player", "Enemies", "Hurtbox", "Hitbox");
     }
 
 

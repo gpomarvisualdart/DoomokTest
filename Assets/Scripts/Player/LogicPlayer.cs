@@ -82,7 +82,6 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
 
         AttackEnds();
 
-        entPhys.collisionLayers = entPhys.defaultcollisionLayers;
         currentState = PlayerStates.Idle;
         entPhys.currentGravity = -50f;
         float jumpVel = Mathf.Sqrt(2 * -entPhys.currentGravity * jumpHeight);
@@ -149,7 +148,7 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
 
     public void RequestStopMovement()
     {
-        entPhys.currentVelocity = Vector3.zero;
+        entPhys.currentVelocity = new Vector3(0f, entPhys.currentVelocity.y, 0f);
         //rb.velocity = Vector3.zero;
         //rb.angularVelocity = Vector3.zero;
         //rb.isKinematic = true;
@@ -176,12 +175,12 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
     Coroutine CO_Dashing; 
     IEnumerator DashDuration()
     {
-        entPhys.collisionLayers = ~LayerMask.GetMask("Enemies", "Hurtbox", "Hitbox");
         //Physics.IgnoreLayerCollision(playerLayer, enemyLayer, true);
-        
+
         var flt_Count = 0f;
         var flt_Length = 0.9f;
         dashEnded = false;
+        entPhys.collisionLayers = ~LayerMask.GetMask("Enemies", "Hurtbox", "Hitbox");
 
         entPhys.currentVelocity = Vector3.zero;
 
@@ -272,9 +271,10 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
     private bool GroundCheck()
     {
         bool onGround = Physics.Raycast(transform.position + transform.up, Vector3.down, 1.2f);
-        if (onGround)
+        if (entPhys.GetLegOnGround())
         {
             numOfJumpsMidAir = 1;
+            if (dashEnded) entPhys.collisionLayers = entPhys.defaultcollisionLayers;
             //if (!rb.isKinematic && currentState != PlayerStates.Dashing && CO_EarlyJumpBoost == null && currentState != PlayerStates.Attacking && CO_OnKnockback == null) { rb.isKinematic = true; }
 
             return true;
@@ -282,6 +282,7 @@ public class LogicPlayer : MonoBehaviour, IDamageDealer, IEntityKnockback, IGene
         else
         {
             //if (rb.isKinematic) { rb.isKinematic = false; }
+            entPhys.collisionLayers = ~LayerMask.GetMask("Enemies", "Hurtbox", "Hitbox");
             if (dashEnded) animComms.RequestPlayAnimation((int)GenericAnimEnums.FALLING, 1, 0, false, false);
             return false; 
         } 

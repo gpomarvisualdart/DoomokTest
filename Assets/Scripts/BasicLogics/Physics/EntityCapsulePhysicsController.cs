@@ -15,6 +15,7 @@ public class EntityCapsulePhysicsController : MonoBehaviour
     public float dragThreshold = 0.1f;
 
     [SerializeField] float defaultGravity = -9.81f;
+    public float GetDefaultGravity() => defaultGravity;
     public float currentGravity = -9.81f;
     public LayerMask collisionLayers;
     [SerializeField] private LayerMask _defaultCollisionLayers;
@@ -43,10 +44,11 @@ public class EntityCapsulePhysicsController : MonoBehaviour
         bool collided = RotaryHeart.Lib.PhysicsExtension.Physics.CapsuleCast(transform.position + pointOne, transform.position + pointTwo, radius, currentVelocity, out hit, currentVelocity.magnitude * Time.fixedDeltaTime, collisionLayers, debugType);
         if (collided)
         {
-            Debug.Log(hit.transform.name);
+            //Debug.Log(hit.transform.name);
             if (currentVelocity.x != 0)
             {
                 Vector3 xDir = new Vector3(currentVelocity.x, 0f, 0f);
+                float xDistance = Mathf.Abs(currentVelocity.x) * Time.fixedDeltaTime;
                 collided = RotaryHeart.Lib.PhysicsExtension.Physics.CapsuleCast(transform.position + pointOne, transform.position + pointTwo, radius, xDir, out hit, currentVelocity.magnitude * Time.fixedDeltaTime, collisionLayers, debugType);
                 if (collided) { currentVelocity.x = 0f; /*Debug.Log($"{hit.transform.gameObject.layer} from {hit.transform.name} with {LayerMask.NameToLayer("Enemies")} and current layer value is {collisionLayers.value} executed by {this.gameObject.name}");*/}
 
@@ -55,7 +57,7 @@ public class EntityCapsulePhysicsController : MonoBehaviour
             {
                 Vector3 yDir = new Vector3(0f, currentVelocity.y, 0f);
                 collided = RotaryHeart.Lib.PhysicsExtension.Physics.CapsuleCast(transform.position + pointOne, transform.position + pointTwo, radius, yDir, out hit, currentVelocity.magnitude * Time.fixedDeltaTime, collisionLayers, debugType);
-                if (collided && Vector3.Dot(hit.normal, Vector3.up) > 0.3f) { currentVelocity.y = 0f; legOnGround = true; currentGravity = defaultGravity;  }
+                if (collided && Vector3.Dot(hit.normal, Vector3.up) > 0.3f) { currentVelocity.y = 0f; legOnGround = true; transform.position = new Vector3(transform.position.x, hit.point.y + 0.01f, transform.position.z); }
             }
         }
 
@@ -68,21 +70,26 @@ public class EntityCapsulePhysicsController : MonoBehaviour
             }
         }
 
-        transform.position += currentVelocity * Time.fixedDeltaTime; 
+        transform.position += new Vector3(currentVelocity.x, 0f, 0f) * Time.fixedDeltaTime;
+        transform.position += new Vector3(0f, currentVelocity.y, 0f) * Time.fixedDeltaTime;
+
     }
 
 
 
-    bool legOnGround;
+    public bool legOnGround;
+    public bool GetLegOnGround() => legOnGround;
     private void GroundCheck()
     {
         if (!legOnGround) return;
 
-        bool onGround = RotaryHeart.Lib.PhysicsExtension.Physics.CapsuleCast(transform.position + pointOne, transform.position + pointTwo, radius, Vector3.down, distGroundCheck, collisionLayers, debugType);
+        RaycastHit hit;
+        bool onGround = RotaryHeart.Lib.PhysicsExtension.Physics.CapsuleCast(transform.position + pointOne, transform.position + pointTwo, radius, Vector3.down, out hit, distGroundCheck, collisionLayers, debugType);
 
-        if (this.gameObject.transform.TryGetComponent(out LogicBoss boss)) { Debug.Log("Boss OnGround!"); }
+        //transform.position = new Vector3(transform.position.x, hit.point.y + 0.001f, transform.position.z);
+        //if (this.gameObject.transform.TryGetComponent(out LogicBoss boss)) { Debug.Log("Boss OnGround!"); }
 
-        if (!onGround) legOnGround = false;
+        if (!onGround) { legOnGround = false; }
         
     }
 
@@ -92,7 +99,7 @@ public class EntityCapsulePhysicsController : MonoBehaviour
         if (!legOnGround)
         {
             currentVelocity.y += currentGravity * Time.fixedDeltaTime;
-            if (this.gameObject.transform.TryGetComponent(out LogicBoss boss)) { Debug.Log("Boss Gravity!"); }
+            //if (this.gameObject.transform.TryGetComponent(out LogicBoss boss)) { Debug.Log("Boss Gravity!"); }
         }
     }
 }
